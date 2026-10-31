@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Dewgal, le site de rencontres sérieuses où chaque profil est vérifié à la main. Inscription gratuite.">
+<meta name="theme-color" content="#2a0d16">
+<title>Dewgal · Rencontres sérieuses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&family=Jost:wght@300;400;500&display=swap">
+<style>
+/* Layout : une colonne étroite façon carton d'invitation, hero → promesses → formulaire */
+:root{
+  --nuit:#2a0d16;
+  --nuit-2:#3a1420;
+  --ivoire:#f3e9dc;
+  --ivoire-doux:#cdbfae;
+  --rose:#e3b3b0;
+  --ligne:rgba(243,233,220,.16);
+  --serif:"Cormorant Garamond", Georgia, "Times New Roman", serif;
+  --sans:"Jost", "Helvetica Neue", Arial, sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--nuit);color:var(--ivoire);font-family:var(--sans);font-weight:300;font-size:16px;line-height:1.6;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px))}
+.wrap{max-width:560px;margin:0 auto;padding-block:40px 56px;display:flex;flex-direction:column;gap:56px}
+.demo{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--nuit);background:var(--rose);padding:6px 12px;border-radius:999px;align-self:center}
+header{text-align:center;display:flex;flex-direction:column;gap:20px;align-items:center}
+.logo{font-family:var(--serif);font-size:22px;letter-spacing:.32em;text-transform:uppercase;color:var(--rose)}
+h1{font-family:var(--serif);font-weight:400;font-size:clamp(38px,9vw,54px);line-height:1.05;margin:0;text-wrap:balance}
+h1 em{color:var(--rose)}
+.lead{color:var(--ivoire-doux);max-width:42ch;margin:0}
+.offre{border:1px solid var(--rose);border-radius:2px;padding:18px 20px;display:flex;flex-direction:column;gap:4px;width:100%}
+.offre b{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--rose)}
+.offre span{font-size:14px;color:var(--ivoire-doux)}
+.cta{display:inline-block;font-family:var(--sans);font-weight:500;font-size:15px;letter-spacing:.08em;text-transform:uppercase;color:var(--nuit);background:var(--ivoire);border:0;padding:16px 28px;border-radius:2px;cursor:pointer;text-decoration:none;width:100%;text-align:center}
+.cta:hover{background:var(--rose)}
+.cta:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--rose);outline-offset:2px}
+.promesses{display:flex;flex-direction:column;border-top:1px solid var(--ligne)}
+.promesses div{display:grid;grid-template-columns:28px 1fr;gap:14px;padding-block:20px;border-bottom:1px solid var(--ligne)}
+.promesses i{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--rose);line-height:1.2}
+.promesses h3{font-family:var(--serif);font-weight:500;font-size:22px;margin:0 0 2px}
+.promesses p{margin:0;color:var(--ivoire-doux);font-size:15px}
+.prix{display:flex;flex-direction:column;gap:12px}
+h2{font-family:var(--serif);font-weight:400;font-size:32px;margin:0;text-wrap:balance}
+.ligne-prix{display:flex;justify-content:space-between;gap:16px;padding-block:10px;border-bottom:1px dotted var(--ligne);font-size:15px}
+.ligne-prix span:last-child{color:var(--rose);font-variant-numeric:tabular-nums;white-space:nowrap}
+form{display:flex;flex-direction:column;gap:16px;background:var(--nuit-2);padding:28px 20px;border-radius:2px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:420px){.row{grid-template-columns:1fr}}
+label{display:flex;flex-direction:column;gap:6px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ivoire-doux);min-width:0}
+input,select{font:inherit;font-size:16px;letter-spacing:0;text-transform:none;color:var(--ivoire);background:transparent;border:0;border-bottom:1px solid var(--ivoire-doux);padding:8px 2px;border-radius:0;width:100%}
+select option{background:var(--nuit-2);color:var(--ivoire)}
+.consent{flex-direction:row;align-items:flex-start;gap:10px;text-transform:none;letter-spacing:0;font-size:13px;line-height:1.5}
+.consent input{width:18px;height:18px;margin-top:2px;flex:none;accent-color:var(--rose)}
+.merci{text-align:center;display:flex;flex-direction:column;gap:10px;padding:28px 20px;background:var(--nuit-2)}
+.merci h2{color:var(--rose)}
+.merci p{margin:0;color:var(--ivoire-doux)}
+footer{text-align:center;font-size:12px;color:var(--ivoire-doux);letter-spacing:.06em}
+@media (prefers-reduced-motion:no-preference){header>*{animation:in .8s ease both}header>*:nth-child(2){animation-delay:.1s}header>*:nth-child(3){animation-delay:.2s}@keyframes in{from{transform:translateY(8px)}to{transform:none}}}
+</style>
+</head>
+<body>
+
+
+<div class="wrap">
+  <header>
+    <div class="logo">Dewgal</div>
+    <h1>Des rencontres <em>sérieuses</em>, pour construire</h1>
+    <p class="lead"><em>Dewgal</em> veut dire « mariage » en peul. Ici, chaque profil est vérifié.</p>
+    <p class="lead" style="font-size:15px">Pas de faux comptes, pas de touristes. Des célibataires sérieux, qui veulent construire quelque chose. Chaque profil est validé à la main par Kaïssa avant d'apparaître.</p>
+    <div class="offre">
+      <b>100 badges « Vérifié » offerts</b>
+      <span>aux 100 premiers inscrits sur la liste d'attente (valeur 19 €)</span>
+    </div>
+    <a class="cta" href="#inscription">Je m'inscris sur la liste</a>
+  </header>
+
+  <section class="promesses" aria-label="Nos engagements">
+    <div><i>i</i><section><h3>Vérifié à la main</h3><p>Photo, identité, intentions : on regarde chaque profil avant de l'ouvrir.</p></section></div>
+    <div><i>ii</i><section><h3>Des filtres qui comptent</h3><p>Origine, religion, projet de mariage, enfants. Trouvez quelqu'un qui partage vos valeurs.</p></section></div>
+    <div><i>iii</i><section><h3>Ouverture en live</h3><p>Le site ouvre très bientôt, en direct sur TikTok. Tout le monde arrive le même soir.</p></section></div>
+  </section>
+
+  <section class="prix">
+    <h2>Gratuit pour s'inscrire</h2>
+    <div class="ligne-prix"><span>Profil, recherche, likes</span><span>Gratuit</span></div>
+    <div class="ligne-prix"><span>Badge Vérifié</span><span>19 € · offert aux 100 premiers</span></div>
+    <div class="ligne-prix"><span>Premium · messages illimités</span><span>9,90 €/mois</span></div>
+    <div class="ligne-prix"><span>Mise en avant</span><span>29 €</span></div>
+  </section>
+
+  <form id="inscription" action="https://formspree.io/f/xaeepevq" method="POST">
+    <h2>Rejoindre la liste</h2>
+    <div class="row">
+      <label for="prenom">Prénom<input id="prenom" name="prenom" required autocomplete="given-name"></label>
+      <label for="age">Âge<input id="age" name="age" type="number" min="18" max="99" required></label>
+    </div>
+    <label for="email">Email<input id="email" name="email" type="email" required autocomplete="email"></label>
+    <div class="row">
+      <label for="genre">Je suis
+        <select id="genre" name="genre"><option>Une femme</option><option>Un homme</option></select>
+      </label>
+      <label for="ville">Ville<input id="ville" name="ville" placeholder="Paris, Lyon…"></label>
+    </div>
+    <div class="row">
+      <label for="origine">Origine<input id="origine" name="origine" placeholder="Pays, région…"></label>
+      <label for="religion">Religion
+        <select id="religion" name="religion"><option>Préfère ne pas dire</option><option>Musulmane</option><option>Chrétienne</option><option>Juive</option><option>Autre</option><option>Sans religion</option></select>
+      </label>
+    </div>
+    <label class="consent" for="rgpd"><input id="rgpd" name="consentement" type="checkbox" value="oui" required>J'accepte que mon origine et ma religion soient utilisées uniquement pour me proposer des profils compatibles. Je peux les supprimer à tout moment.</label>
+    <input type="hidden" name="_subject" value="Nouvelle inscription Dewgal">
+    <p id="err" hidden style="margin:0;color:var(--rose);font-size:14px">L'envoi n'a pas marché. Vérifiez votre connexion et réessayez.</p>
+    <button class="cta" type="submit">Réserver ma place</button>
+  </form>
+
+  <div class="merci" id="merci" hidden>
+    <h2>Votre place est réservée</h2>
+    <p>Vous recevrez le lien d'ouverture par email, le soir du live.</p>
+  </div>
+
+  <footer style="display:flex;flex-direction:column;gap:10px"><span style="font-family:var(--serif);font-size:18px;letter-spacing:0;color:var(--ivoire)">Vous préférez un accompagnement sur-mesure ?<br><a href="https://agence-liora.fr" style="color:var(--rose)">Découvrez l'agence Liora →</a></span><span>Dewgal · un projet Glow Hub SASU · contact@agence-liora.fr</span><span style="font-size:11px">Vos informations servent uniquement à vous prévenir de l'ouverture et à vous proposer des profils compatibles. Elles ne sont jamais revendues.</span></footer>
+</div>
+
+<script>
+var f=document.getElementById('inscription');
+f.addEventListener('submit', function(e){
+  e.preventDefault();
+  if(!f.reportValidity()) return;
+  var btn=f.querySelector('button'); btn.disabled=true; btn.textContent='Envoi…';
+  fetch(f.action,{method:'POST',body:new FormData(f),headers:{'Accept':'application/json'}})
+    .then(function(r){ if(!r.ok) throw 0;
+      f.hidden=true; var m=document.getElementById('merci'); m.hidden=false;
+      m.scrollIntoView({behavior:'smooth',block:'center'}); })
+    .catch(function(){ document.getElementById('err').hidden=false; btn.disabled=false; btn.textContent='Réserver ma place'; });
+});
+</script>
+</body>
+</html>
