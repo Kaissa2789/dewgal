@@ -124,7 +124,10 @@ footer{text-align:center;font-size:12px;color:var(--ivoire-doux);letter-spacing:
         <select id="religion" name="religion"><option>Préfère ne pas dire</option><option>Musulmane</option><option>Chrétienne</option><option>Juive</option><option>Autre</option><option>Sans religion</option></select>
       </label>
     </div>
-    <label class="consent" for="rgpd"><input id="rgpd" name="consentement" type="checkbox" value="oui" required>J'accepte que mon origine et ma religion soient utilisées uniquement pour me proposer des profils compatibles. Je peux les supprimer à tout moment.</label>
+    <label for="peuple" id="peuple-wrap" hidden>Peuple / ethnie <span style="text-transform:none;letter-spacing:0">(facultatif)</span>
+      <select id="peuple" name="peuple"></select>
+    </label>
+    <label class="consent" for="rgpd"><input id="rgpd" name="consentement" type="checkbox" value="oui" required>J'accepte que mon origine, mon peuple et ma religion soient utilisés uniquement pour me proposer des profils compatibles. Je peux les supprimer à tout moment.</label>
     <input type="hidden" name="_subject" value="Nouvelle inscription Dewgal">
     <p id="err" hidden style="margin:0;color:var(--rose);font-size:14px">L'envoi n'a pas marché. Vérifiez votre connexion et réessayez.</p>
     <button class="cta" type="submit">Réserver ma place</button>
@@ -138,6 +141,21 @@ footer{text-align:center;font-size:12px;color:var(--ivoire-doux);letter-spacing:
   <footer style="display:flex;flex-direction:column;gap:10px"><span style="font-family:var(--serif);font-size:18px;letter-spacing:0;color:var(--ivoire)">Vous préférez un accompagnement sur-mesure ?<br><a href="https://agence-liora.fr" style="color:var(--rose)">Découvrez l'agence Liora →</a></span><span>Dewgal · un projet Glow Hub SASU · contact@agence-liora.fr</span><span style="font-size:11px">Vos informations servent uniquement à vous prévenir de l'ouverture et à vous proposer des profils compatibles. Elles ne sont jamais revendues.</span></footer>
 </div>
 
+<script>
+var PEUPLES={"Sénégal": ["Wolofs", "Peuls", "Toucouleurs", "Sérères", "Diolas", "Mandingues", "Soninkés", "Bassaris", "Diakhankés", "Karoninkas", "Manjaques", "Lébous"], "Gambie": ["Mandingues", "Peuls", "Wolofs", "Diolas", "Soninkés", "Sérères"], "Guinée": ["Peuls", "Malinkés", "Soussous", "Kissis", "Guerzés", "Tomas", "Bassaris", "Diakhankés"], "Sierra Leone": ["Krios", "Temnés", "Mendés", "Limbas", "Soussous", "Peuls"], "Mali": ["Bambaras", "Peuls", "Soninkés", "Malinkés", "Dogons", "Songhaïs", "Sénoufos", "Bobos", "Bozos", "Touaregs", "Bellas", "Miniankas", "Kurumbas", "Maures"], "Mauritanie": ["Maures", "Haratines", "Peuls", "Soninkés", "Wolofs", "Zénagas", "Imraguens"], "Burkina Faso": ["Mossis", "Peuls", "Gourmantchés", "Bissas", "Bobos", "Samos", "Lobis", "Dagaras", "Gans", "Toussians", "Karaboros", "Sénoufos", "Sissalas"], "Niger": ["Haoussas", "Zarmas-Songhaïs", "Peuls", "Touaregs", "Kanouris", "Toubous", "Arabes"], "Nigéria": ["Yorubas", "Igbos", "Haoussas", "Peuls", "Edos", "Ijaws", "Tivs", "Kanouris", "Ibibios", "Igalas", "Nupes", "Jukuns", "Itsekiris", "Igedes", "Kanembus"], "Bénin": ["Fons", "Adjas", "Yorubas", "Baribas (Baatonu)", "Minas", "Sombas (Ditamaris)", "Dendis", "Gouns", "Aïzos", "Holis", "Peuls", "Anii", "Biali"], "Togo": ["Éwés", "Kabiyès", "Minas", "Tems", "Mobas", "Gourmas", "Bassars", "Lossos", "Akpossos", "Anoufos", "Tchokossis", "Akébous", "Ouatchis", "Adjas"], "Ghana": ["Ashantis", "Fantis", "Akyems", "Akwamus", "Bonos", "Éwés", "Ga-Adangbés", "Dagombas", "Mole-Dagbons", "Gonjas", "Walas", "Kusasis", "Frafras", "Nzemas", "Sissalas"], "Côte d'Ivoire": ["Baoulés", "Bétés", "Sénoufos", "Malinkés (Dioulas)", "Agnis", "Attiés", "Abidjis", "Dans (Yacoubas)", "Guérés (Wês)", "Krous", "Kroumen", "Koulangos", "Lobis", "Gouros", "Gagous", "Krobous", "Niarafolos", "Koyakas", "Wans"], "Guinée-Bissau": ["Balantes", "Peuls", "Mandingues", "Papels", "Manjaques", "Bijagos", "Biafadas", "Mancagnes", "Nalus", "Diolas (Felupes)", "Bainouks"], "Cameroun": ["Bamilékés", "Bétis", "Bassas", "Doualas", "Sawas", "Bamouns", "Peuls", "Tikars", "Grassfields", "Mandaras", "Kirdis", "Bakas", "Makas", "Banyangis"], "Gabon": ["Fangs", "Punus", "Myènès", "Mpongwés", "Nzebis", "Obambas", "Tékés", "Siras", "Galoas", "Vilis", "Kotas", "Tsoghos", "Okandés", "Bakas", "Babongos"], "Congo": ["Kongos (Bakongos)", "Laris", "Tékés", "Mbochis", "Sanghas", "Vilis"], "RD Congo": ["Lubas", "Kongos", "Mongos", "Ngalas", "Ngbandis", "Tetelas", "Lendus", "Hemas", "Nandes", "Banyamulenge", "Lundas", "Yakas"], "Angola": ["Ovimbundus", "Mbundus", "Kongos", "Lundas", "Tchokwés", "Ganguelas", "Nyanekas", "Kuvales", "Luvales"], "Namibie": ["Ovambos", "Hereros", "Himbas", "Damaras", "Namas", "Kuvales"], "Algérie": ["Arabes", "Kabyles", "Chaouis", "Mozabites", "Touaregs"], "Maroc": ["Arabes", "Rifains", "Chleuhs", "Amazighs du Moyen Atlas", "Sahraouis"], "Tunisie": ["Arabes", "Amazighs"], "Comores": ["Grands-Comoriens", "Anjouanais", "Mohéliens"], "Tchad": ["Saras", "Arabes", "Kanembous", "Toubous", "Zaghawas", "Haoussas", "Peuls"], "Centrafrique": ["Gbayas", "Bandas", "Mandjas", "Saras", "Ngbakas", "Yakomas", "Peuls"], "Djibouti": ["Afars", "Somalis (Issas)"], "Éthiopie": ["Oromos", "Amharas", "Somalis", "Tigréens", "Sidamas", "Gouragués", "Afars"], "Érythrée": ["Tigrinyas", "Tigrés", "Afars", "Sahos", "Bilens"], "Somalie": ["Somalis"], "Kenya": ["Kikuyus", "Luos", "Luhyas", "Kalenjins", "Kambas", "Massaïs", "Somalis"], "Madagascar": ["Merinas", "Betsimisarakas", "Betsileos", "Sakalavas", "Antandroys", "Tsimihetys"]};
+(function(){
+  var o=document.getElementById('origine'), w=document.getElementById('peuple-wrap'), sel=document.getElementById('peuple');
+  function opt(t,v){var e=document.createElement('option');e.textContent=t;if(v!==undefined)e.value=v;return e;}
+  o.addEventListener('change',function(){
+    var list=PEUPLES[o.value]; sel.innerHTML='';
+    if(!list){w.hidden=true;return;}
+    sel.appendChild(opt('Choisir…',''));
+    list.slice().sort(function(a,b){return a.localeCompare(b,'fr');}).forEach(function(x){sel.appendChild(opt(x));});
+    sel.appendChild(opt('Plusieurs peuples')); sel.appendChild(opt('Autre')); sel.appendChild(opt('Préfère ne pas dire'));
+    w.hidden=false;
+  });
+})();
+</script>
 <script>
 var f=document.getElementById('inscription');
 f.addEventListener('submit', function(e){
