@@ -1,7 +1,7 @@
 import { db, stripe, json, readBody, clean, isEmail, decodeImage, PRIX, SITE } from './_lib.js';
 
 // POST /api/demande → demande de mise en relation avec une annonce, renvoie le lien de paiement
-export default async function handler(req, res) {
+async function traiter(req, res) {
   if (req.method !== 'POST') return json(res, 405, { error: 'Méthode non autorisée' });
   const b = await readBody(req);
   const annonce_id = parseInt(b.annonce_id, 10);
@@ -51,4 +51,14 @@ export default async function handler(req, res) {
   });
   await sb.from('demandes').update({ stripe_session: session.id, photo_path }).eq('id', row.id);
   return json(res, 200, { url: session.url });
+}
+
+export default async function handler(req, res) {
+  try {
+    return await traiter(req, res);
+  } catch (e) {
+    console.error(e);
+    const msg = e?.type?.startsWith?.('Stripe') ? `Paiement indisponible (${e.code || e.type}) : ${e.message}` : 'Une erreur est survenue, réessayez dans un instant.';
+    return json(res, 500, { error: msg });
+  }
 }

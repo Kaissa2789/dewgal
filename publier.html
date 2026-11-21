@@ -64,7 +64,7 @@
     <label for="email">Email (jamais affiché)<input id="email" name="email" type="email" required autocomplete="email"></label>
     <label for="telephone">Téléphone (facultatif, partagé seulement si vous le décidez)<input id="telephone" name="telephone" type="tel" autocomplete="tel"></label>
 
-    <label class="consent" for="ok"><input id="ok" type="checkbox" required>J'ai 18 ans ou plus. J'accepte les <a href="/cgu.html" target="_blank">CGU</a> et que mon origine, mon peuple et ma religion soient affichés sur mon annonce. Si j'accepte une mise en relation, ma photo est transmise à cette personne ; mes coordonnées ne le sont que si je choisis de les partager.</label>
+    <label class="consent" for="ok"><input id="ok" type="checkbox" required><span>J'ai 18 ans ou plus. J'accepte les <a href="/cgu.html" target="_blank">CGU</a> et que mon origine, mon peuple et ma religion soient affichés sur mon annonce. Si j'accepte une mise en relation, ma photo est transmise à cette personne ; mes coordonnées ne le sont que si je choisis de les partager.</span></label>
     <p class="erreur" id="err" hidden></p>
     <button class="cta" type="submit" id="go">Payer 29 € et envoyer</button>
   </form>
@@ -111,7 +111,7 @@ $('form').addEventListener('submit', async (e) => {
     btn.textContent = 'Redirection vers le paiement…';
     const data = Object.fromEntries(new FormData(f).entries());
     const r = await fetch('/api/publier', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, photo, flou, selfie, consent: $('ok').checked }) });
-    const j = await r.json();
+    const j = await r.json().catch(() => ({ error: 'Le serveur ne répond pas correctement (' + r.status + '). Réessayez dans un instant.' }));
     if (!r.ok) throw new Error(j.error || 'Une erreur est survenue.');
     location.href = j.url;
   } catch (x) { manque(x.message); btn.disabled = false; majBouton(); }

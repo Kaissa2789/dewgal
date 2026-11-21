@@ -52,7 +52,7 @@
       <label for="q-tel">Téléphone (facultatif, partagé seulement si vous l'acceptez tous les deux)<input id="q-tel" name="telephone" type="tel" autocomplete="tel"></label>
       <label class="photo" for="q-photo">Votre photo (transmise seulement si elle ou il accepte)<input id="q-photo" type="file" accept="image/*" hidden><span id="q-photo-txt">Ajouter une photo de vous</span><img id="q-photo-apercu" alt="" hidden></label>
       <label for="q-msg">Votre message<textarea id="q-msg" name="message" required placeholder="Présentez-vous en quelques lignes : qui vous êtes, ce que vous recherchez…"></textarea></label>
-      <label class="consent" for="q-ok"><input id="q-ok" type="checkbox" required>J'ai 18 ans ou plus, j'accepte que mes informations soient transmises à cette personne et j'accepte les <a href="/cgu.html" target="_blank">CGU</a>. Je demande que ma demande soit transmise immédiatement et je reconnais perdre mon droit de rétractation une fois qu'elle l'a été.</label>
+      <label class="consent" for="q-ok"><input id="q-ok" type="checkbox" required><span>J'ai 18 ans ou plus, j'accepte que mes informations soient transmises à cette personne et j'accepte les <a href="/cgu.html" target="_blank">CGU</a>. Je demande que ma demande soit transmise immédiatement et je reconnais perdre mon droit de rétractation une fois qu'elle l'a été.</span></label>
       <p class="erreur" id="q-err" hidden></p>
       <button class="cta" type="submit">Payer 9,90 € et envoyer</button>
     </form>
@@ -121,7 +121,7 @@ document.getElementById('demande').addEventListener('submit', async (e) => {
     const photo = await photoCompressee(fichier);
     const r = await fetch('/api/demande',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
       annonce_id: courante.id, prenom: f.prenom.value, age: f.age.value, email: f.email.value, telephone: f.telephone.value, message: f.message.value, photo, consent: document.getElementById('q-ok').checked })});
-    const j = await r.json();
+    const j = await r.json().catch(() => ({ error: 'Le serveur ne répond pas correctement (' + r.status + '). Réessayez dans un instant.' }));
     if(!r.ok) throw new Error(j.error || 'Une erreur est survenue.');
     location.href = j.url;
   }catch(x){ err.textContent = x.message; err.hidden = false; btn.disabled = false; btn.textContent = 'Payer 9,90 € et envoyer'; }
