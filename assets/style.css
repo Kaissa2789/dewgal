@@ -60,7 +60,7 @@ select option,select optgroup{background:var(--nuit-2);color:var(--ivoire)}
 .photo{border:1px dashed var(--rose);padding:14px;text-align:center;text-transform:none;letter-spacing:0;font-size:14px;color:var(--ivoire);cursor:pointer}
 .photo img{max-width:140px;max-height:140px;display:block;margin:8px auto 0}
 .erreur{color:var(--rose);font-size:14px;margin:0}
-.vide{border:1px dashed var(--ligne);padding:28px;text-align:center;color:var(--ivoire-doux)}
+.vide{border:1px dashed var(--ligne);padding:28px;text-align:center;color:var(--ivoire-doux);grid-column:1/-1}
 dialog{background:var(--nuit);color:var(--ivoire);border:1px solid var(--ligne);padding:0;max-width:560px;width:calc(100% - 32px)}
 dialog::backdrop{background:rgba(0,0,0,.6)}
 .dlg{padding:24px 20px;display:flex;flex-direction:column;gap:16px;max-height:85vh;overflow:auto}
