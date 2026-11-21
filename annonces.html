@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a0d16">
+<meta name="description" content="Annonces de rencontre vérifiées une à une. Pour des rencontres sérieuses, en vue du mariage.">
+<title>Annonces vérifiées · Dewgal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<style>.flou{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--nuit)}.flou-wrap{position:relative;margin:-20px -20px 4px}.flou-wrap span{position:absolute;bottom:10px;left:10px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;background:rgba(42,13,22,.75);padding:4px 8px}</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top">
+    <a class="logo" href="/">DEWGAL</a>
+    <a class="btn small" href="/publier.html">Publier mon annonce</a>
+  </div>
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <h1>Des annonces <em>vérifiées</em>, pour construire</h1>
+    <p class="lead">Chaque annonce est relue par une vraie personne avant d'être publiée. Une annonce vous plaît ? Demandez une mise en relation : si la personne accepte, vous recevez ses coordonnées.</p>
+  </header>
+  <div class="filtres" role="group" aria-label="Filtrer les annonces">
+    <button type="button" data-f="tous" aria-pressed="true">Toutes</button>
+    <button type="button" data-f="elle" aria-pressed="false">Elles</button>
+    <button type="button" data-f="lui" aria-pressed="false">Eux</button>
+  </div>
+  <section id="grille" class="grille" aria-live="polite"><p class="vide">Chargement des annonces…</p></section>
+  <footer>
+    <span>Dewgal · un projet Glow Hub SASU</span>
+    <span><a href="/mentions-legales.html">Mentions légales</a> · <a href="/cgu.html">CGU et CGV</a> · <a href="/confidentialite.html">Confidentialité</a></span>
+  </footer>
+</main>
+
+<dialog id="dlg" aria-labelledby="d-nom">
+  <div class="dlg">
+    <div class="top"><span class="kicker" id="d-tag"></span><button class="btn ghost small" type="button" id="fermer">Fermer</button></div>
+    <img id="d-flou" class="flou" alt="" hidden>
+    <h2 id="d-nom"></h2>
+    <p class="lead" id="d-ident"></p>
+    <p style="font-family:var(--serif);font-style:italic;font-size:20px;margin:0" id="d-hook"></p>
+    <div><div class="kicker" id="d-lead">Recherche</div><p style="margin:6px 0 0" id="d-seek"></p></div>
+    <form class="f" id="demande" novalidate>
+      <h2 style="font-size:24px">Demander une mise en relation · 9,90 €</h2>
+      <p class="lead" style="font-size:14px">Votre message est transmis à la personne. Si elle accepte, vous recevez tous les deux vos coordonnées par email. Sans réponse sous 7 jours, vous êtes remboursé·e.</p>
+      <div class="row">
+        <label for="q-prenom">Prénom<input id="q-prenom" name="prenom" required autocomplete="given-name"></label>
+        <label for="q-age">Âge<input id="q-age" name="age" type="number" min="18" max="99" required></label>
+      </div>
+      <label for="q-email">Email<input id="q-email" name="email" type="email" required autocomplete="email"></label>
+      <label for="q-tel">Téléphone (facultatif, transmis seulement si elle ou il accepte)<input id="q-tel" name="telephone" type="tel" autocomplete="tel"></label>
+      <label class="photo" for="q-photo">Votre photo (transmise seulement si elle ou il accepte)<input id="q-photo" type="file" accept="image/*" hidden><span id="q-photo-txt">Ajouter une photo de vous</span><img id="q-photo-apercu" alt="" hidden></label>
+      <label for="q-msg">Votre message<textarea id="q-msg" name="message" required placeholder="Présentez-vous en quelques lignes : qui vous êtes, ce que vous recherchez…"></textarea></label>
+      <label class="consent" for="q-ok"><input id="q-ok" type="checkbox" required>J'ai 18 ans ou plus et j'accepte que mes informations soient transmises à cette personne, ainsi que les <a href="/cgu.html" target="_blank">CGU</a>.</label>
+      <p class="erreur" id="q-err" hidden></p>
+      <button class="cta" type="submit">Payer 9,90 € et envoyer</button>
+    </form>
+  </div>
+</dialog>
+
+<script src="/assets/images.js"></script>
+<script>
+const grille = document.getElementById('grille');
+const dlg = document.getElementById('dlg');
+let annonces = [], filtre = 'tous', courante = null;
+
+function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+function ident(a){ return [a.origine && ('Origine ' + a.origine + (a.peuple ? ' · ' + a.peuple : '')), a.religion, a.profession, a.ville].filter(Boolean).join(' · '); }
+
+function rendre(){
+  grille.innerHTML='';
+  const liste = annonces.filter(a => filtre==='tous' || a.genre===filtre);
+  if(!liste.length){ grille.append(el('p','vide', annonces.length ? 'Aucune annonce dans cette catégorie pour le moment.' : 'Les premières annonces arrivent très bientôt. Soyez parmi les premiers : publiez la vôtre.')); return; }
+  for(const a of liste){
+    const c = el('article','carte'+(a.une?' une':''));
+    if(a.flou){ const w=el('div','flou-wrap'); const im=el('img','flou'); im.src=a.flou; im.alt='Photo floutée de '+a.prenom; im.loading='lazy'; w.append(im, el('span',null,'Photo dévoilée si elle ou il accepte')); c.append(w); }
+    const h = el('div','haut');
+    const tags = el('div'); tags.style.display='flex'; tags.style.gap='6px';
+    tags.append(el('span','pill rose', a.genre==='elle'?'Elle':'Lui'));
+    if(a.une) tags.append(el('span','pill ivoire','À la une'));
+    h.append(tags, el('span','num','N°'+a.id));
+    c.append(h, el('div','nom', a.prenom+', '+a.age+' ans'), el('div','ident', ident(a)), el('div','hook', a.description), el('div','seek', (a.genre==='elle'?'Elle recherche : ':'Il recherche : ')+a.recherche));
+    const b = el('button','btn small','Demander une mise en relation'); b.type='button'; b.style.marginTop='8px';
+    b.onclick = () => ouvrir(a);
+    c.append(b);
+    grille.append(c);
+  }
+}
+
+function ouvrir(a){
+  courante = a;
+  document.getElementById('d-tag').textContent = (a.genre==='elle'?'Elle':'Lui') + ' · N°' + a.id;
+  document.getElementById('d-nom').textContent = a.prenom + ', ' + a.age + ' ans';
+  document.getElementById('d-ident').textContent = ident(a);
+  document.getElementById('d-hook').textContent = a.description;
+  document.getElementById('d-lead').textContent = a.genre==='elle'?'Elle recherche':'Il recherche';
+  document.getElementById('d-seek').textContent = a.recherche;
+  const fl=document.getElementById('d-flou'); if(a.flou){ fl.src=a.flou; fl.alt='Photo floutée de '+a.prenom; fl.hidden=false; } else fl.hidden=true;
+  document.getElementById('q-err').hidden = true;
+  dlg.showModal();
+}
+document.getElementById('fermer').onclick = () => dlg.close();
+document.getElementById('q-photo').addEventListener('change', e => { const f=e.target.files[0]; if(!f) return; const ap=document.getElementById('q-photo-apercu'); ap.src=URL.createObjectURL(f); ap.hidden=false; document.getElementById('q-photo-txt').textContent='Photo ajoutée · changer'; });
+
+document.querySelectorAll('.filtres button').forEach(b => b.onclick = () => {
+  filtre = b.dataset.f;
+  document.querySelectorAll('.filtres button').forEach(x => x.setAttribute('aria-pressed', String(x===b)));
+  rendre();
+});
+
+document.getElementById('demande').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, err = document.getElementById('q-err'), btn = f.querySelector('button[type=submit]');
+  err.hidden = true;
+  if(!f.reportValidity()) return;
+  const fichier = document.getElementById('q-photo').files[0];
+  if(!fichier){ err.textContent='Merci d\'ajouter une photo de vous.'; err.hidden=false; return; }
+  btn.disabled = true; btn.textContent = 'Redirection vers le paiement…';
+  try{
+    const photo = await photoCompressee(fichier);
+    const r = await fetch('/api/demande',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({
+      annonce_id: courante.id, prenom: f.prenom.value, age: f.age.value, email: f.email.value, telephone: f.telephone.value, message: f.message.value, photo, consent: document.getElementById('q-ok').checked })});
+    const j = await r.json();
+    if(!r.ok) throw new Error(j.error || 'Une erreur est survenue.');
+    location.href = j.url;
+  }catch(x){ err.textContent = x.message; err.hidden = false; btn.disabled = false; btn.textContent = 'Payer 9,90 € et envoyer'; }
+});
+
+fetch('/api/annonces').then(r=>r.json()).then(j=>{
+  annonces = j.annonces || []; rendre();
+  const n = new URLSearchParams(location.search).get('n');
+  const a = n && annonces.find(x => String(x.id)===n); if(a) ouvrir(a);
+}).catch(()=>{ grille.innerHTML=''; grille.append(el('p','vide','Impossible de charger les annonces. Rechargez la page.')); });
+</script>
+</body>
+</html>

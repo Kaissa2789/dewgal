@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a0d16">
+<title>Publier mon annonce · Dewgal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<main class="wrap narrow">
+  <div class="top"><a class="logo" href="/">DEWGAL</a><a href="/annonces.html">Voir les annonces</a></div>
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <h1>Publier mon <em>annonce</em></h1>
+    <p class="lead">Votre annonce est relue par une vraie personne sous 48 h. Si elle n'est pas validée, vous êtes remboursé·e.</p>
+  </header>
+  <p class="erreur" id="annule" hidden>Paiement annulé : votre annonce n'a pas été publiée. Vous pouvez réessayer.</p>
+  <form class="f" id="form" novalidate>
+    <div class="kicker">1 · Votre formule</div>
+    <div class="formules">
+      <label class="formule" for="f-std"><input type="radio" id="f-std" name="formule" value="standard"><span style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="display:flex;gap:8px"><b>Annonce vérifiée</b><span class="prix">19 €</span></span><span style="color:var(--ivoire-doux)">En ligne 30 jours</span></span></label>
+      <label class="formule" for="f-une"><input type="radio" id="f-une" name="formule" value="une" checked><span style="display:flex;flex-direction:column;gap:2px;flex:1"><span style="display:flex;gap:8px"><b>À la une</b><span class="prix">29 €</span></span><span style="color:var(--ivoire-doux)">30 jours, dont 7 jours en tête des annonces + présentée en live</span></span></label>
+    </div>
+
+    <div class="kicker">2 · Vous</div>
+    <div class="row">
+      <label for="genre">Je suis<select id="genre" name="genre" required><option value="elle">Une femme</option><option value="lui">Un homme</option></select></label>
+      <label for="prenom">Prénom (seul affiché)<input id="prenom" name="prenom" required autocomplete="given-name"></label>
+    </div>
+    <div class="row">
+      <label for="age">Âge<input id="age" name="age" type="number" min="18" max="99" required></label>
+      <label for="ville">Ville<input id="ville" name="ville" placeholder="Paris, Dakar, Bruxelles…"></label>
+    </div>
+    <div class="row">
+      <label for="origine">Origine
+        <select id="origine" name="origine">
+          <option value="" selected>Choisir…</option>
+          <optgroup label="Afrique"><option>Afrique du Sud</option><option>Algérie</option><option>Angola</option><option>Botswana</option><option>Burkina Faso</option><option>Burundi</option><option>Bénin</option><option>Cameroun</option><option>Cap-Vert</option><option>Centrafrique</option><option>Comores</option><option>Congo</option><option>Côte d'Ivoire</option><option>Djibouti</option><option>Égypte</option><option>Érythrée</option><option>Eswatini</option><option>Éthiopie</option><option>Gabon</option><option>Gambie</option><option>Ghana</option><option>Guinée</option><option>Guinée équatoriale</option><option>Guinée-Bissau</option><option>Kenya</option><option>Lesotho</option><option>Liberia</option><option>Libye</option><option>Madagascar</option><option>Malawi</option><option>Mali</option><option>Maroc</option><option>Maurice</option><option>Mauritanie</option><option>Mozambique</option><option>Namibie</option><option>Niger</option><option>Nigéria</option><option>Ouganda</option><option>RD Congo</option><option>Rwanda</option><option>Sao Tomé-et-Principe</option><option>Seychelles</option><option>Sierra Leone</option><option>Somalie</option><option>Soudan</option><option>Soudan du Sud</option><option>Sénégal</option><option>Tanzanie</option><option>Tchad</option><option>Togo</option><option>Tunisie</option><option>Zambie</option><option>Zimbabwe</option></optgroup>
+          <optgroup label="Outre-mer"><option>Guadeloupe</option><option>Guyane</option><option>La Réunion</option><option>Martinique</option><option>Mayotte</option><option>Nouvelle-Calédonie</option><option>Polynésie française</option></optgroup>
+          <optgroup label="Europe"><option>Albanie</option><option>Allemagne</option><option>Autriche</option><option>Belgique</option><option>Bosnie-Herzégovine</option><option>Bulgarie</option><option>Croatie</option><option>Danemark</option><option>Espagne</option><option>Finlande</option><option>France</option><option>Grèce</option><option>Hongrie</option><option>Irlande</option><option>Italie</option><option>Kosovo</option><option>Luxembourg</option><option>Macédoine du Nord</option><option>Moldavie</option><option>Monténégro</option><option>Norvège</option><option>Pays-Bas</option><option>Pologne</option><option>Portugal</option><option>Roumanie</option><option>Royaume-Uni</option><option>Russie</option><option>Serbie</option><option>Slovaquie</option><option>Suisse</option><option>Suède</option><option>Tchéquie</option><option>Ukraine</option></optgroup>
+          <optgroup label="Amériques et Caraïbes"><option>Argentine</option><option>Bolivie</option><option>Brésil</option><option>Canada</option><option>Chili</option><option>Colombie</option><option>Cuba</option><option>Équateur</option><option>États-Unis</option><option>Haïti</option><option>Jamaïque</option><option>Mexique</option><option>Pérou</option><option>République dominicaine</option><option>Sainte-Lucie</option><option>Trinité-et-Tobago</option><option>Venezuela</option></optgroup>
+          <optgroup label="Moyen-Orient"><option>Arabie saoudite</option><option>Arménie</option><option>Émirats arabes unis</option><option>Irak</option><option>Iran</option><option>Israël</option><option>Jordanie</option><option>Koweït</option><option>Liban</option><option>Oman</option><option>Palestine</option><option>Qatar</option><option>Syrie</option><option>Turquie</option><option>Yémen</option></optgroup>
+          <optgroup label="Asie"><option>Afghanistan</option><option>Bangladesh</option><option>Cambodge</option><option>Chine</option><option>Corée du Sud</option><option>Géorgie</option><option>Inde</option><option>Indonésie</option><option>Japon</option><option>Kazakhstan</option><option>Laos</option><option>Malaisie</option><option>Ouzbékistan</option><option>Pakistan</option><option>Philippines</option><option>Sri Lanka</option><option>Thaïlande</option><option>Viêt Nam</option></optgroup>
+          <optgroup label="Océanie"><option>Australie</option><option>Nouvelle-Zélande</option></optgroup>
+          <option>Plusieurs origines</option><option>Préfère ne pas dire</option>
+        </select>
+      </label>
+      <label for="religion">Religion
+        <select id="religion" name="religion"><option value="">Préfère ne pas dire</option><option>Musulmane</option><option>Chrétienne</option><option>Juive</option><option>Autre</option><option>Sans religion</option></select>
+      </label>
+    </div>
+    <label for="peuple" id="peuple-wrap" hidden>Peuple / ethnie (facultatif)<select id="peuple" name="peuple"></select></label>
+    <label for="profession">Profession (facultatif)<input id="profession" name="profession"></label>
+    <label for="description">Vous en quelques mots<textarea id="description" name="description" required maxlength="400" placeholder="Votre caractère, vos passions, votre façon de vivre…"></textarea></label>
+    <label for="recherche">Ce que vous recherchez<textarea id="recherche" name="recherche" required maxlength="500" placeholder="Tranche d'âge, valeurs, projet de mariage, enfants…"></textarea></label>
+
+    <div class="kicker">3 · Vos photos</div>
+    <label class="photo" for="photo">Photo de profil · affichée <strong>floutée</strong> sur l'annonce, nette seulement pour les personnes que vous acceptez<input id="photo" type="file" accept="image/*" hidden><span id="photo-txt">Ajouter ma photo</span><img id="photo-ap" alt="" hidden></label>
+    <label class="photo" for="selfie">Selfie de vérification · levez 2 doigts, visage bien visible. Jamais publié, supprimé après vérification<input id="selfie" type="file" accept="image/*" capture="user" hidden><span id="selfie-txt">Prendre mon selfie</span><img id="selfie-ap" alt="" hidden></label>
+
+    <div class="kicker">4 · Vous contacter</div>
+    <label for="email">Email (jamais affiché)<input id="email" name="email" type="email" required autocomplete="email"></label>
+    <label for="telephone">Téléphone (facultatif, transmis seulement aux personnes que vous acceptez)<input id="telephone" name="telephone" type="tel" autocomplete="tel"></label>
+
+    <label class="consent" for="ok"><input id="ok" type="checkbox" required>J'ai 18 ans ou plus. J'accepte les <a href="/cgu.html" target="_blank">CGU</a> et que mon origine, mon peuple et ma religion soient affichés sur mon annonce. Si j'accepte une mise en relation, ma photo et mes coordonnées sont transmises à cette personne.</label>
+    <p class="erreur" id="err" hidden></p>
+    <button class="cta" type="submit" id="go">Payer 29 € et envoyer</button>
+  </form>
+  <footer><span><a href="/mentions-legales.html">Mentions légales</a> · <a href="/cgu.html">CGU et CGV</a> · <a href="/confidentialite.html">Confidentialité</a></span></footer>
+</main>
+<script src="/assets/images.js"></script>
+<script>
+var PEUPLES={"Sénégal": ["Wolofs", "Peuls", "Sérères", "Diolas", "Mandingues", "Soninkés", "Bassaris", "Diakhankés", "Karoninkas", "Manjaques", "Lébous"], "Gambie": ["Mandingues", "Peuls", "Wolofs", "Diolas", "Soninkés", "Sérères"], "Guinée": ["Peuls", "Malinkés", "Soussous", "Kissis", "Guerzés", "Tomas", "Bassaris", "Diakhankés"], "Sierra Leone": ["Krios", "Temnés", "Mendés", "Limbas", "Soussous", "Peuls"], "Mali": ["Bambaras", "Peuls", "Soninkés", "Malinkés", "Dogons", "Songhaïs", "Sénoufos", "Bobos", "Bozos", "Touaregs", "Bellas", "Miniankas", "Kurumbas", "Maures"], "Mauritanie": ["Maures", "Haratines", "Peuls", "Soninkés", "Wolofs", "Zénagas", "Imraguens"], "Burkina Faso": ["Mossis", "Peuls", "Gourmantchés", "Bissas", "Bobos", "Samos", "Lobis", "Dagaras", "Gans", "Toussians", "Karaboros", "Sénoufos", "Sissalas"], "Niger": ["Haoussas", "Zarmas-Songhaïs", "Peuls", "Touaregs", "Kanouris", "Toubous", "Arabes"], "Nigéria": ["Yorubas", "Igbos", "Haoussas", "Peuls", "Edos", "Ijaws", "Tivs", "Kanouris", "Ibibios", "Igalas", "Nupes", "Jukuns", "Itsekiris", "Igedes", "Kanembus"], "Bénin": ["Fons", "Adjas", "Yorubas", "Baribas (Baatonu)", "Minas", "Sombas (Ditamaris)", "Dendis", "Gouns", "Aïzos", "Holis", "Peuls", "Anii", "Biali"], "Togo": ["Éwés", "Kabiyès", "Minas", "Tems", "Mobas", "Gourmas", "Bassars", "Lossos", "Akpossos", "Anoufos", "Tchokossis", "Akébous", "Ouatchis", "Adjas"], "Ghana": ["Ashantis", "Fantis", "Akyems", "Akwamus", "Bonos", "Éwés", "Ga-Adangbés", "Dagombas", "Mole-Dagbons", "Gonjas", "Walas", "Kusasis", "Frafras", "Nzemas", "Sissalas"], "Côte d'Ivoire": ["Baoulés", "Bétés", "Sénoufos", "Malinkés (Dioulas)", "Agnis", "Attiés", "Abidjis", "Dans (Yacoubas)", "Guérés (Wês)", "Krous", "Kroumen", "Koulangos", "Lobis", "Gouros", "Gagous", "Krobous", "Niarafolos", "Koyakas", "Wans"], "Guinée-Bissau": ["Balantes", "Peuls", "Mandingues", "Papels", "Manjaques", "Bijagos", "Biafadas", "Mancagnes", "Nalus", "Diolas (Felupes)", "Bainouks"], "Cameroun": ["Bamilékés", "Bétis", "Bassas", "Doualas", "Sawas", "Bamouns", "Peuls", "Tikars", "Grassfields", "Mandaras", "Kirdis", "Bakas", "Makas", "Banyangis"], "Gabon": ["Fangs", "Punus", "Myènès", "Mpongwés", "Nzebis", "Obambas", "Tékés", "Siras", "Galoas", "Vilis", "Kotas", "Tsoghos", "Okandés", "Bakas", "Babongos"], "Congo": ["Kongos (Bakongos)", "Laris", "Tékés", "Mbochis", "Sanghas", "Vilis"], "RD Congo": ["Lubas", "Kongos", "Mongos", "Ngalas", "Ngbandis", "Tetelas", "Lendus", "Hemas", "Nandes", "Banyamulenge", "Lundas", "Yakas"], "Angola": ["Ovimbundus", "Mbundus", "Kongos", "Lundas", "Tchokwés", "Ganguelas", "Nyanekas", "Kuvales", "Luvales"], "Namibie": ["Ovambos", "Hereros", "Himbas", "Damaras", "Namas", "Kuvales"], "Algérie": ["Arabes", "Kabyles", "Chaouis", "Mozabites", "Touaregs"], "Maroc": ["Arabes", "Rifains", "Chleuhs", "Amazighs du Moyen Atlas", "Sahraouis"], "Tunisie": ["Arabes", "Amazighs"], "Comores": ["Grands-Comoriens", "Anjouanais", "Mohéliens"], "Tchad": ["Saras", "Arabes", "Kanembous", "Toubous", "Zaghawas", "Haoussas", "Peuls"], "Centrafrique": ["Gbayas", "Bandas", "Mandjas", "Saras", "Ngbakas", "Yakomas", "Peuls"], "Djibouti": ["Afars", "Somalis (Issas)"], "Éthiopie": ["Oromos", "Amharas", "Somalis", "Tigréens", "Sidamas", "Gouragués", "Afars"], "Érythrée": ["Tigrinyas", "Tigrés", "Afars", "Sahos", "Bilens"], "Somalie": ["Somalis"], "Kenya": ["Kikuyus", "Luos", "Luhyas", "Kalenjins", "Kambas", "Massaïs", "Somalis"], "Madagascar": ["Merinas", "Betsimisarakas", "Betsileos", "Sakalavas", "Antandroys", "Tsimihetys"]};
+const $ = (id) => document.getElementById(id);
+if (new URLSearchParams(location.search).get('annule')) $('annule').hidden = false;
+
+const o = $('origine'), w = $('peuple-wrap'), sel = $('peuple');
+function opt(t, v) { const e = document.createElement('option'); e.textContent = t; if (v !== undefined) e.value = v; return e; }
+o.addEventListener('change', () => {
+  const list = PEUPLES[o.value]; sel.innerHTML = '';
+  if (!list) { w.hidden = true; return; }
+  sel.appendChild(opt('Choisir…', ''));
+  list.slice().sort((a, b) => a.localeCompare(b, 'fr')).forEach((x) => sel.appendChild(opt(x)));
+  ['Plusieurs peuples', 'Autre'].forEach((x) => sel.appendChild(opt(x)));
+  sel.appendChild(opt('Préfère ne pas dire', ''));
+  w.hidden = false;
+});
+
+function majBouton() { $('go').textContent = 'Payer ' + (document.querySelector('input[name=formule]:checked').value === 'une' ? '29' : '19') + ' € et envoyer'; }
+document.querySelectorAll('input[name=formule]').forEach((r) => r.addEventListener('change', majBouton));
+
+function apercu(input, img, txt, label) {
+  input.addEventListener('change', () => { const f = input.files[0]; if (!f) return; img.src = URL.createObjectURL(f); img.hidden = false; txt.textContent = label; });
+}
+apercu($('photo'), $('photo-ap'), $('photo-txt'), 'Photo ajoutée · changer');
+apercu($('selfie'), $('selfie-ap'), $('selfie-txt'), 'Selfie ajouté · changer');
+
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const f = e.target, err = $('err'), btn = $('go');
+  err.hidden = true;
+  const manque = (m) => { err.textContent = m; err.hidden = false; };
+  if (!f.reportValidity()) return;
+  if (!$('photo').files[0]) return manque('Merci d\'ajouter votre photo de profil.');
+  if (!$('selfie').files[0]) return manque('Merci d\'ajouter votre selfie de vérification.');
+  btn.disabled = true; btn.textContent = 'Préparation des photos…';
+  try {
+    const [photo, flou, selfie] = await Promise.all([photoCompressee($('photo').files[0]), photoFloutee($('photo').files[0]), photoCompressee($('selfie').files[0])]);
+    btn.textContent = 'Redirection vers le paiement…';
+    const data = Object.fromEntries(new FormData(f).entries());
+    const r = await fetch('/api/publier', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, photo, flou, selfie, consent: $('ok').checked }) });
+    const j = await r.json();
+    if (!r.ok) throw new Error(j.error || 'Une erreur est survenue.');
+    location.href = j.url;
+  } catch (x) { manque(x.message); btn.disabled = false; majBouton(); }
+});
+</script>
+</body>
+</html>

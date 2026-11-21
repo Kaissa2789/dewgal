@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2a0d16">
+<title>Admin · Dewgal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<style>
+.photos{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.photos figure{margin:0;display:flex;flex-direction:column;gap:4px}
+.photos img{width:100%;aspect-ratio:3/4;object-fit:cover;background:var(--nuit)}
+.photos figcaption{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ivoire-doux)}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+.priv{font-size:13px;color:var(--ivoire-doux);word-break:break-all}
+.liste{display:flex;flex-direction:column;border-top:1px solid var(--ligne)}
+.liste div{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--ligne);font-size:14px}
+.liste span:last-child{color:var(--ivoire-doux);text-align:right}
+.stats{display:flex;gap:10px;flex-wrap:wrap}
+.stats div{background:var(--nuit-2);padding:12px 16px;flex:1;min-width:120px}
+.stats b{display:block;font-family:var(--serif);font-size:30px;font-weight:400;color:var(--rose);font-variant-numeric:tabular-nums}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="top"><a class="logo" href="/">DEWGAL</a><span class="kicker">Admin</span></div>
+
+  <form class="f" id="login">
+    <h2>Connexion</h2>
+    <label for="mdp">Mot de passe admin<input id="mdp" type="password" required autocomplete="current-password"></label>
+    <p class="erreur" id="login-err" hidden></p>
+    <button class="cta" type="submit">Entrer</button>
+  </form>
+
+  <section id="app" hidden style="display:flex;flex-direction:column;gap:28px">
+    <div class="stats">
+      <div><b id="s-verif">0</b>à vérifier</div>
+      <div><b id="s-pub">0</b>en ligne</div>
+      <div><b id="s-dem">0</b>demandes</div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <h2>À vérifier</h2>
+      <p class="lead" style="font-size:14px">Compare le selfie (2 doigts levés) et la photo de profil : même personne ? Puis relis le texte.</p>
+      <div id="verif" class="grille"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <h2>En ligne</h2>
+      <div id="pub" class="liste"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <h2>Dernières demandes</h2>
+      <div id="dem" class="liste"></div>
+    </div>
+    <button class="btn ghost small" type="button" id="refresh">Actualiser</button>
+  </section>
+</main>
+<script>
+let MDP = '';
+try { MDP = sessionStorage.getItem('dewgal-admin') || ''; } catch (e) {}
+const $ = (id) => document.getElementById(id);
+function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
+const date = (d) => d ? new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
+const STATUTS = { envoyee: 'en attente de réponse', acceptee: 'acceptée ✓', refusee: 'refusée', expiree: 'expirée, remboursée' };
+
+async function api(body) {
+  const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-password': MDP }, body: JSON.stringify(body) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw Object.assign(new Error(j.error || 'Erreur'), { status: r.status });
+  return j;
+}
+
+async function charger() {
+  const d = await api({ action: 'liste' });
+  $('login').hidden = true; $('app').hidden = false;
+  $('s-verif').textContent = d.aVerifier.length; $('s-pub').textContent = d.publiees.length; $('s-dem').textContent = d.demandes.length;
+
+  const v = $('verif'); v.innerHTML = '';
+  if (!d.aVerifier.length) v.append(el('p', 'vide', 'Rien à vérifier pour le moment 🤍'));
+  for (const a of d.aVerifier) {
+    const c = el('article', 'carte' + (a.formule === 'une' ? ' une' : ''));
+    const h = el('div', 'haut'); h.append(el('span', 'pill rose', a.genre === 'elle' ? 'Elle' : 'Lui'), el('span', 'num', (a.formule === 'une' ? 'À la une · 29 €' : '19 €') + ' · N°' + a.id));
+    const ph = el('div', 'photos');
+    for (const [u, t] of [[a.selfie_url, 'Selfie'], [a.photo_url, 'Photo de profil']]) {
+      const f = el('figure'); const i = el('img'); if (u) i.src = u; i.alt = t; f.append(i, el('figcaption', null, t)); ph.append(f);
+    }
+    c.append(h, ph, el('div', 'nom', a.prenom + ', ' + a.age + ' ans'),
+      el('div', 'ident', [a.origine, a.peuple, a.religion, a.profession, a.ville].filter(Boolean).join(' · ')),
+      el('div', 'hook', a.description), el('div', 'seek', 'Recherche : ' + a.recherche),
+      el('div', 'priv', a.email + (a.telephone ? ' · ' + a.telephone : '')));
+    const act = el('div', 'actions');
+    const ok = el('button', 'btn small', 'Valider et publier'); ok.type = 'button';
+    const ko = el('button', 'btn ghost small', 'Refuser et rembourser'); ko.type = 'button';
+    const motif = el('input'); motif.placeholder = 'Motif du refus (envoyé à la personne)'; motif.setAttribute('aria-label', 'Motif du refus'); motif.hidden = true;
+    ok.onclick = async () => { ok.disabled = ko.disabled = true; try { await api({ action: 'valider', id: a.id }); await charger(); } catch (e) { alerte(e); ok.disabled = ko.disabled = false; } };
+    ko.onclick = async () => {
+      if (motif.hidden) { motif.hidden = false; ko.textContent = 'Confirmer le refus'; motif.focus(); return; }
+      ok.disabled = ko.disabled = true;
+      try { await api({ action: 'refuser', id: a.id, motif: motif.value }); await charger(); } catch (e) { alerte(e); ok.disabled = ko.disabled = false; }
+    };
+    act.append(ok, ko); c.append(act, motif); v.append(c);
+  }
+
+  const p = $('pub'); p.innerHTML = '';
+  if (!d.publiees.length) p.append(el('div', null, 'Aucune annonce en ligne'));
+  for (const a of d.publiees) {
+    const r = el('div'); const une = a.featured_until && a.featured_until > new Date().toISOString();
+    r.append(el('span', null, 'N°' + a.id + ' · ' + a.prenom + ', ' + a.age + ' ans' + (une ? ' · À la une' : '')), el('span', null, 'jusqu\'au ' + date(a.expires_at)));
+    p.append(r);
+  }
+  const dm = $('dem'); dm.innerHTML = '';
+  if (!d.demandes.length) dm.append(el('div', null, 'Aucune demande pour le moment'));
+  for (const x of d.demandes) { const r = el('div'); r.append(el('span', null, x.prenom + ' → annonce N°' + x.annonce_id), el('span', null, (STATUTS[x.status] || x.status) + ' · ' + date(x.created_at))); dm.append(r); }
+}
+
+function alerte(e) {
+  if (e.status === 401) { $('app').hidden = true; $('login').hidden = false; $('login-err').textContent = 'Mot de passe incorrect.'; $('login-err').hidden = false; return; }
+  const p = el('p', 'erreur', e.message); $('verif').prepend(p); setTimeout(() => p.remove(), 5000);
+}
+
+$('login').addEventListener('submit', async (ev) => {
+  ev.preventDefault(); MDP = $('mdp').value;
+  try { sessionStorage.setItem('dewgal-admin', MDP); } catch (e) {}
+  try { await charger(); } catch (e) { alerte(e); }
+});
+$('refresh').onclick = () => charger().catch(alerte);
+if (MDP) charger().catch(alerte);
+</script>
+</body>
+</html>

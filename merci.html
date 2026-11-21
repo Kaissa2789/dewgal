@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#2a0d16">
+<title>Merci · Dewgal</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+<main class="wrap narrow">
+  <a class="logo" href="/">DEWGAL</a>
+  <h1 id="t">Merci 🤍</h1>
+  <p class="lead" id="p">Votre paiement est bien reçu.</p>
+  <a class="cta" href="/annonces.html">Voir les annonces</a>
+</main>
+<script>
+const type = new URLSearchParams(location.search).get('type');
+if (type === 'annonce') {
+  document.getElementById('t').textContent = 'Votre annonce est bien reçue';
+  document.getElementById('p').textContent = "Elle va être relue par une vraie personne sous 48 h. Vous recevrez un email dès qu'elle sera en ligne. Si elle n'est pas validée, vous serez remboursé·e.";
+} else if (type === 'demande') {
+  document.getElementById('t').textContent = 'Votre demande est envoyée';
+  document.getElementById('p').textContent = "La personne reçoit votre message maintenant. Si elle accepte, vous recevrez sa photo et ses coordonnées par email. Sans réponse sous 7 jours, vous êtes remboursé·e automatiquement.";
+}
+</script>
+</body>
+</html>
