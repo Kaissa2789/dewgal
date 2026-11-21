@@ -65,3 +65,8 @@ insert into storage.buckets (id, name, public) values
   ('photos',  'photos',  false),   -- photos nettes, privées
   ('flous',   'flous',   true)     -- photos floutées, visibles sur les annonces
 on conflict (id) do nothing;
+
+-- Accès réservé au serveur (clé service_role) : aucun accès depuis le navigateur
+revoke all on table annonces, demandes from anon, authenticated;
+grant all on table annonces, demandes to service_role;
+grant usage, select on all sequences in schema public to service_role;
