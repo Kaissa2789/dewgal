@@ -20,7 +20,7 @@ export default async function handler(req, res) {
   if (event.type !== 'checkout.session.completed') return json(res, 200, { ok: true });
 
   const s = event.data.object;
-  if (s.payment_status !== 'paid') return json(res, 200, { ok: true });
+  if (s.payment_status !== 'paid' && s.payment_status !== 'no_payment_required') return json(res, 200, { ok: true });
   const { type, id } = s.metadata || {};
   const sb = db();
   const now = new Date().toISOString();
