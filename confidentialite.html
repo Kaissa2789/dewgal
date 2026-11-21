@@ -28,6 +28,14 @@ td{padding:10px 8px 10px 0;border-bottom:1px solid var(--ligne);vertical-align:t
 td:last-child{text-align:right;white-space:nowrap;color:var(--rose)}
 nav{margin-top:56px;padding-top:24px;border-top:1px solid var(--ligne);display:flex;flex-wrap:wrap;gap:8px 20px;font-size:14px}
 </style>
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dewgal">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="/assets/pwa.js" defer></script>
 </head>
 <body>
 <div class="wrap">
@@ -43,6 +51,7 @@ nav{margin-top:56px;padding-top:24px;border-top:1px solid var(--ligne);display:f
 <li><strong>Liste d'attente</strong> : prénom, âge, email, genre, ville, pays d'origine, peuple, religion.</li>
 <li><strong>Compte membre</strong> : les mêmes informations, vos photos, votre description, vos préférences de recherche, vos messages et le selfie de vérification.</li>
 <li><strong>Messagerie</strong> : les messages échangés après une mise en relation acceptée. Ils ne sont lus par l'équipe Dewgal qu'en cas de signalement.</li>
+<li><strong>Notifications</strong> : si vous les activez, l'adresse technique de votre téléphone pour vous prévenir des nouveaux messages. Vous pouvez les désactiver à tout moment dans les réglages de votre téléphone.</li>
 <li><strong>Paiements</strong> : gérés par Stripe. Nous recevons uniquement la confirmation du paiement, jamais vos numéros de carte.</li>
 </ul>
 

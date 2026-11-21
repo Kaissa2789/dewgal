@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import Stripe from 'stripe';
+import webpush from 'web-push';
 
 export const PRIX = { standard: 1900, une: 2900, demande: 990 }; // en centimes
 export const DUREE_ANNONCE_JOURS = 30;
@@ -110,4 +111,20 @@ export async function photoNette(sb, path) {
   if (!path) return null;
   const { data } = await sb.storage.from('photos').createSignedUrl(path, 7 * 86400);
   return data?.signedUrl || null;
+}
+
+// Notifications sur le téléphone (Web Push). Silencieux si les clés VAPID ne sont pas configurées.
+export const VAPID_PUBLIC = process.env.VAPID_PUBLIC_KEY || '';
+export async function envoyerPush(sb, token, donnees) {
+  if (!VAPID_PUBLIC || !process.env.VAPID_PRIVATE_KEY || !token) return;
+  webpush.setVapidDetails('mailto:' + (process.env.REPLY_TO || 'contact@dewgal.fr'), VAPID_PUBLIC, process.env.VAPID_PRIVATE_KEY);
+  const { data: subs } = await sb.from('push_abonnements').select('id, endpoint, p256dh, auth').eq('token', token);
+  await Promise.all((subs || []).map(async (s) => {
+    try {
+      await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, JSON.stringify(donnees), { TTL: 86400 });
+    } catch (e) {
+      if (e && (e.statusCode === 404 || e.statusCode === 410)) await sb.from('push_abonnements').delete().eq('id', s.id);
+      else console.error('push', e?.statusCode, e?.body || e?.message);
+    }
+  }));
 }

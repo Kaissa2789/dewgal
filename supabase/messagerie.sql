@@ -20,3 +20,19 @@ create index if not exists messages_demande_idx on messages(demande_id, created_
 alter table messages enable row level security;
 revoke all on table messages from anon, authenticated;
 grant all on table messages to service_role;
+
+-- Notifications (à coller ensuite)
+alter table demandes add column if not exists vu_a_at timestamptz;
+alter table demandes add column if not exists vu_d_at timestamptz;
+create table if not exists push_abonnements (
+  id         bigint generated always as identity primary key,
+  created_at timestamptz not null default now(),
+  token      uuid not null,
+  endpoint   text not null unique,
+  p256dh     text not null,
+  auth       text not null
+);
+create index if not exists push_token_idx on push_abonnements(token);
+alter table push_abonnements enable row level security;
+revoke all on table push_abonnements from anon, authenticated;
+grant all on table push_abonnements to service_role;

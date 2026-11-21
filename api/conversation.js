@@ -1,4 +1,4 @@
-import { db, json, readBody, clean, sendEmail, bouton, esc, photoNette, SITE } from './_lib.js';
+import { db, json, readBody, clean, sendEmail, bouton, esc, photoNette, envoyerPush, SITE } from './_lib.js';
 
 const MAX_MESSAGES = 500;
 const NOTIF_DELAI_MIN = 15; // pas plus d'un email « nouveau message » toutes les 15 min par personne
@@ -6,7 +6,7 @@ const NOTIF_DELAI_MIN = 15; // pas plus d'un email « nouveau message » toutes 
 // Retrouve la conversation et le côté (a = personne de l'annonce, d = personne qui a demandé)
 async function trouver(sb, token) {
   if (!token || !/^[0-9a-f-]{36}$/i.test(token)) return null;
-  const champs = 'id, annonce_id, prenom, age, email, telephone, photo_path, status, token_a, token_d, partage_a, partage_d, partage_at, notif_a_at, notif_d_at, signalee';
+  const champs = '*'; // tolère l'absence de colonnes ajoutées plus tard
   let { data: d } = await sb.from('demandes').select(champs).eq('token_a', token).maybeSingle();
   let cote = 'a';
   if (!d) { ({ data: d } = await sb.from('demandes').select(champs).eq('token_d', token).maybeSingle()); cote = 'd'; }
@@ -19,6 +19,7 @@ async function trouver(sb, token) {
   const autre = cote === 'a'
     ? { prenom: d.prenom, age: d.age, email: d.email, telephone: d.telephone, photo_path: d.photo_path, token: d.token_d }
     : { prenom: a.prenom, age: a.age, email: a.email, telephone: a.telephone, photo_path: a.photo_path, token: d.token_a };
+  moi.token = cote === 'a' ? d.token_a : d.token_d;
   return { d, a, cote, autreCote: cote === 'a' ? 'd' : 'a', moi, autre };
 }
 
@@ -33,6 +34,7 @@ export default async function handler(req, res) {
     const t = new URL(req.url, 'http://x').searchParams.get('t');
     const c = await trouver(sb, t);
     if (!c) return json(res, 404, { error: 'Conversation introuvable ou expirée.' });
+    await sb.from('demandes').update({ [c.cote === 'a' ? 'vu_a_at' : 'vu_d_at']: new Date().toISOString() }).eq('id', c.d.id);
     const { data: msgs } = await sb.from('messages').select('id, auteur, contenu, created_at').eq('demande_id', c.d.id).order('created_at').limit(MAX_MESSAGES);
     const partageMoi = c.cote === 'a' ? c.d.partage_a : c.d.partage_d;
     const partageAutre = c.cote === 'a' ? c.d.partage_d : c.d.partage_a;
@@ -66,6 +68,13 @@ export default async function handler(req, res) {
     const { error } = await sb.from('messages').insert({ demande_id: c.d.id, auteur: c.cote, contenu });
     if (error) return json(res, 500, { error: 'Envoi impossible, réessayez.' });
 
+    // Notification sur le téléphone de l'autre, avec le nombre de messages non lus
+    const vuAutre = c.autreCote === 'a' ? c.d.vu_a_at : c.d.vu_d_at;
+    let q = sb.from('messages').select('id', { count: 'exact', head: true }).eq('demande_id', c.d.id).eq('auteur', c.cote);
+    if (vuAutre) q = q.gt('created_at', vuAutre);
+    const { count: nonLus } = await q;
+    await envoyerPush(sb, c.autre.token, { titre: 'Dewgal', texte: `${c.moi.prenom} vous a écrit 💬`, url: `/conversation.html?t=${c.autre.token}`, badge: nonLus || 1, tag: `conv-${c.d.id}` });
+
     // Prévenir l'autre par email (au plus une fois toutes les 15 min)
     const champNotif = c.autreCote === 'a' ? 'notif_a_at' : 'notif_d_at';
     const derniere = c.d[champNotif] ? new Date(c.d[champNotif]) : null;
@@ -96,6 +105,7 @@ export default async function handler(req, res) {
         await sendEmail({ to: process.env.ADMIN_EMAIL, subject: `✅ Coordonnées échangées · ${c.a.prenom} (N°${c.a.id}) et ${c.d.prenom}`,
           html: `<p>Les deux personnes ont accepté d'échanger leurs coordonnées. Chacune a reçu celles de l'autre par email.</p><p><strong>Annonce N°${c.a.id}</strong><br>${coordHtml(c.cote === 'a' ? c.moi : c.autre)}</p><p><strong>Demande</strong><br>${coordHtml(c.cote === 'd' ? c.moi : c.autre)}</p>` });
     } else if (!autreDejaOk) {
+      await envoyerPush(sb, c.autre.token, { titre: 'Dewgal', texte: `${c.moi.prenom} souhaite échanger vos coordonnées`, url: `/conversation.html?t=${c.autre.token}`, tag: `conv-${c.d.id}` });
       await sendEmail({ to: c.autre.email, subject: `${c.moi.prenom} souhaite échanger vos coordonnées`,
         html: `<p>Bonjour ${esc(c.autre.prenom)},</p><p>${esc(c.moi.prenom)} aimerait poursuivre la conversation par téléphone ou par email. Si vous êtes d'accord, cliquez sur « Partager mes coordonnées » dans votre conversation. Rien ne sera dévoilé tant que vous n'aurez pas accepté.</p>${bouton(`${SITE}/conversation.html?t=${c.autre.token}`, 'Ouvrir la conversation')}` });
     }

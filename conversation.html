@@ -31,6 +31,15 @@ html,body{height:100%}
 .saisie .cta{min-height:48px;padding:0 18px}
 .debut{text-align:center;color:var(--ivoire-doux);font-size:13px;padding:24px 8px}
 </style>
+<link rel="manifest" id="mf" href="/manifest.webmanifest">
+<link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dewgal">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script>(function(){var t=new URLSearchParams(location.search).get('t');if(t){document.getElementById('mf').href='/api/manifest?t='+encodeURIComponent(t);}})();</script>
+<script src="/assets/pwa.js"></script>
 </head>
 <body>
 <div class="chat">
@@ -41,6 +50,7 @@ html,body{height:100%}
   </div>
 
   <div id="partage" class="bandeau" style="margin-top:12px" hidden></div>
+  <div id="notif" class="bandeau" style="margin-top:8px" hidden></div>
 
   <div class="fil" id="fil" aria-live="polite"><p class="debut">Chargement…</p></div>
 
@@ -134,7 +144,46 @@ $('dlg-signal').addEventListener('close', async () => {
   catch (x) { erreur(x.message); }
 });
 
-charger().catch((e) => { $('fil').innerHTML = ''; $('fil').append(el('p', 'debut', e.message)); $('form').hidden = true; $('signaler').hidden = true; });
+
+// ---- Appli et notifications ----
+function b64ToU8(b){ const p='='.repeat((4-b.length%4)%4); const r=atob((b+p).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from([...r].map(c=>c.charCodeAt(0))); }
+const estIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform==='MacIntel' && navigator.maxTouchPoints>1);
+const installee = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+async function activerNotifs(btn){
+  btn.disabled = true;
+  try {
+    const perm = await Notification.requestPermission();
+    if (perm !== 'granted') throw new Error('Notifications refusées. Vous pourrez les réactiver dans les réglages du téléphone.');
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToU8(window.DEWGAL_VAPID) });
+    const r = await fetch('/api/push', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ t: T, subscription: sub.toJSON() }) });
+    if (!r.ok) throw new Error('Activation impossible, réessayez.');
+    afficherNotif();
+  } catch (e) { erreur(e.message); btn.disabled = false; }
+}
+async function afficherNotif(){
+  const b = $('notif'); b.innerHTML = '';
+  const supporte = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  if (estIOS && !installee){
+    b.append(el('strong', null, '📲 Installez Dewgal sur votre iPhone'), el('span', null, 'Touchez le bouton Partager (le carré avec une flèche), puis « Sur l’écran d’accueil ». Ouvrez ensuite Dewgal depuis l’icône pour activer les notifications.'));
+    b.hidden = false; return;
+  }
+  if (!supporte){ b.hidden = true; return; }
+  if (Notification.permission === 'granted'){
+    try { const reg = await navigator.serviceWorker.ready; const sub = await reg.pushManager.getSubscription(); if (sub){ b.hidden = true; fetch('/api/push',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({t:T,subscription:sub.toJSON()})}).catch(()=>{}); return; } } catch(e){}
+  }
+  if (Notification.permission === 'denied'){ b.hidden = true; return; }
+  const btn = el('button', 'btn small', '🔔 Activer les notifications'); btn.type = 'button'; btn.onclick = () => activerNotifs(btn);
+  b.append(el('span', null, 'Soyez prévenu·e dès que ' + (etat ? etat.autre.prenom : 'la personne') + ' vous écrit, avec une pastille sur l’icône.'), btn);
+  if (!installee) b.append(el('span', null, 'Astuce : ajoutez Dewgal à votre écran d’accueil pour l’ouvrir comme une appli.'));
+  b.hidden = false;
+}
+function effacerPastille(){ try { if ('clearAppBadge' in navigator) navigator.clearAppBadge(); } catch(e){} }
+document.addEventListener('visibilitychange', () => { if (!document.hidden) effacerPastille(); });
+effacerPastille();
+
+charger().then(afficherNotif).catch((e) => { $('fil').innerHTML = ''; $('fil').append(el('p', 'debut', e.message)); $('form').hidden = true; $('signaler').hidden = true; });
 setInterval(() => { if (!document.hidden && etat) charger().catch(() => {}); }, 8000);
 </script>
 </body>
