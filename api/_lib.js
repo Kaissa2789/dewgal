@@ -5,7 +5,7 @@ export const PRIX = { standard: 1900, une: 2900, demande: 990 }; // en centimes
 export const DUREE_ANNONCE_JOURS = 30;
 export const DUREE_UNE_JOURS = 7;
 export const DELAI_REPONSE_JOURS = 7;
-export const REMBOURSER_SI_REFUS = true; // mettre false pour garder les 9,90 € quand la personne refuse
+export const REMBOURSER_SI_REFUS = false; // mettre false pour garder les 9,90 € quand la personne refuse
 
 export const SITE = (process.env.SITE_URL || 'https://dewgal.fr').replace(/\/$/, '');
 

@@ -1,4 +1,4 @@
-import { db, stripe, sendEmail, esc, photoNette, REMBOURSER_SI_REFUS } from './_lib.js';
+import { db, stripe, sendEmail, esc, photoNette, bouton, SITE, REMBOURSER_SI_REFUS } from './_lib.js';
 
 function page(res, titre, texte) {
   res.statusCode = 200;
@@ -38,8 +38,13 @@ export default async function handler(req, res) {
 
   await sb.from('demandes').update({ status: 'refusee', responded_at: now }).eq('id', d.id);
   if (REMBOURSER_SI_REFUS && d.payment_intent) { try { await stripe().refunds.create({ payment_intent: d.payment_intent }); } catch (e) { console.error(e); } }
-  await sendEmail({ to: d.email, subject: 'Réponse à votre demande Dewgal',
-    html: `<p>Bonjour ${esc(d.prenom)},</p><p>${esc(a.prenom)} a pris le temps de lire votre message, mais ne souhaite pas donner suite. Ce n'est pas un jugement : les critères de chacun sont personnels.</p>${REMBOURSER_SI_REFUS ? '<p>Vous êtes intégralement remboursé·e (sous 5 à 10 jours sur votre compte).</p>' : ''}<p>D'autres annonces vous attendent sur Dewgal.</p>` });
+  await sendEmail({ to: d.email, subject: 'Une réponse à votre demande Dewgal',
+    html: `<p>Bonjour ${esc(d.prenom)},</p>
+<p>${esc(a.prenom)} a pris le temps de lire votre message avec attention, et vous remercie sincèrement pour votre démarche. Elle ou il a préféré ne pas donner suite cette fois-ci.</p>
+<p>Ce n'est en rien un jugement sur vous : chacun cherche quelque chose de très personnel, et parfois les chemins ne se croisent simplement pas. Votre sincérité a de la valeur, ne la perdez pas.</p>
+<p>La bonne personne est peut-être déjà sur Dewgal, ou sur le point d'y arriver. Prenez le temps de découvrir les autres annonces vérifiées 🤍</p>
+${bouton(`${SITE}/annonces.html`, 'Voir les annonces')}
+<p>Avec toute notre bienveillance,<br>L'équipe Dewgal</p>` });
   if (process.env.ADMIN_EMAIL)
     await sendEmail({ to: process.env.ADMIN_EMAIL, subject: `Mise en relation refusée · ${a.prenom} (N°${a.id}) / ${d.prenom}`,
       html: `<p>${esc(a.prenom)} a refusé la demande de ${esc(d.prenom)} (${esc(d.email)}).${REMBOURSER_SI_REFUS ? ' Remboursement automatique effectué.' : ''}</p>` });
