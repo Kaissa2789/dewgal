@@ -30,6 +30,9 @@ export default async function handler(req, res) {
       html: `<p>Bonjour ${esc(d.prenom)},</p><p>Bonne nouvelle : ${esc(a.prenom)} souhaite aussi faire votre connaissance. Voici sa photo et ses coordonnées :</p>${img(photoA, a.prenom)}<p>${coord(a)}</p>${conseil}` });
     await sendEmail({ to: a.email, replyTo: d.email, subject: `Vos coordonnées ont été transmises à ${d.prenom}`,
       html: `<p>Bonjour ${esc(a.prenom)},</p><p>Vous avez accepté la demande de ${esc(d.prenom)}. Voici sa photo et ses coordonnées :</p>${img(photoD, d.prenom)}<p>${coord(d)}</p>${conseil}` });
+    if (process.env.ADMIN_EMAIL)
+      await sendEmail({ to: process.env.ADMIN_EMAIL, subject: `✅ Mise en relation acceptée · ${a.prenom} (N°${a.id}) et ${d.prenom}`,
+        html: `<p>${esc(a.prenom)} a accepté la demande de ${esc(d.prenom)}. Les deux ont reçu par email la photo et les coordonnées de l'autre.</p><p><strong>Annonce N°${a.id}</strong><br>${coord(a)}</p><p><strong>Demande</strong><br>${coord(d)}</p>` });
     return page(res, 'C\'est fait 🎉', `Vos coordonnées et celles de ${esc(d.prenom)} viennent de vous être envoyées par email. Belle rencontre !`);
   }
 
@@ -37,5 +40,8 @@ export default async function handler(req, res) {
   if (REMBOURSER_SI_REFUS && d.payment_intent) { try { await stripe().refunds.create({ payment_intent: d.payment_intent }); } catch (e) { console.error(e); } }
   await sendEmail({ to: d.email, subject: 'Réponse à votre demande Dewgal',
     html: `<p>Bonjour ${esc(d.prenom)},</p><p>${esc(a.prenom)} a pris le temps de lire votre message, mais ne souhaite pas donner suite. Ce n'est pas un jugement : les critères de chacun sont personnels.</p>${REMBOURSER_SI_REFUS ? '<p>Vous êtes intégralement remboursé·e (sous 5 à 10 jours sur votre compte).</p>' : ''}<p>D'autres annonces vous attendent sur Dewgal.</p>` });
+  if (process.env.ADMIN_EMAIL)
+    await sendEmail({ to: process.env.ADMIN_EMAIL, subject: `Mise en relation refusée · ${a.prenom} (N°${a.id}) / ${d.prenom}`,
+      html: `<p>${esc(a.prenom)} a refusé la demande de ${esc(d.prenom)} (${esc(d.email)}).${REMBOURSER_SI_REFUS ? ' Remboursement automatique effectué.' : ''}</p>` });
   return page(res, 'C\'est noté', `${esc(d.prenom)} sera prévenu·e avec délicatesse. Merci d'avoir répondu.`);
 }

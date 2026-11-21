@@ -62,6 +62,9 @@ ${bouton(`${base}&r=oui`, 'J\'accepte la mise en relation')}
 <p><a href="${base}&r=non" style="color:#cdbfae">Je préfère refuser</a></p>
 <p style="font-size:13px;color:#cdbfae">Sans réponse sous ${DELAI_REPONSE_JOURS} jours, la demande sera annulée.</p>`,
       });
+      if (process.env.ADMIN_EMAIL)
+        await sendEmail({ to: process.env.ADMIN_EMAIL, subject: `Nouvelle demande · ${d.prenom}, ${d.age} ans → ${a.prenom} (N°${a.id})`,
+          html: `<p>${esc(d.prenom)} (${esc(d.email)}) a payé 9,90 € pour rencontrer ${esc(a.prenom)} (annonce N°${a.id}). L'email « J'accepte / Je refuse » vient de partir.</p>` });
       await sendEmail({
         to: d.email,
         subject: 'Votre demande a bien été transmise',
