@@ -22,19 +22,22 @@ export default async function handler(req, res) {
 
   if (r === 'oui') {
     await sb.from('demandes').update({ status: 'acceptee', responded_at: now }).eq('id', d.id);
+    const { data: dd } = await sb.from('demandes').select('token_a, token_d').eq('id', d.id).single();
     const [photoA, photoD] = await Promise.all([photoNette(sb, a.photo_path), photoNette(sb, d.photo_path)]);
     const img = (u, n) => (u ? `<p><img src="${u}" alt="Photo de ${esc(n)}" style="max-width:240px;width:100%;display:block"></p>` : '');
-    const coord = (p) => `<strong>${esc(p.prenom)}</strong>, ${p.age} ans<br>Email : <a href="mailto:${esc(p.email)}" style="color:#e3b3b0">${esc(p.email)}</a>${p.telephone ? `<br>Téléphone : ${esc(p.telephone)}` : ''}`;
-    const conseil = '<p style="font-size:13px;color:#cdbfae">Conseils : faites connaissance d\'abord par message ou appel, retrouvez-vous dans un lieu public, et ne transmettez jamais d\'argent.</p>';
-    await sendEmail({ to: d.email, replyTo: a.email, subject: `${a.prenom} a accepté votre demande 🎉`,
-      html: `<p>Bonjour ${esc(d.prenom)},</p><p>Bonne nouvelle : ${esc(a.prenom)} souhaite aussi faire votre connaissance. Voici sa photo et ses coordonnées :</p>${img(photoA, a.prenom)}<p>${coord(a)}</p>${conseil}` });
-    await sendEmail({ to: a.email, replyTo: d.email, subject: `Vos coordonnées ont été transmises à ${d.prenom}`,
-      html: `<p>Bonjour ${esc(a.prenom)},</p><p>Vous avez accepté la demande de ${esc(d.prenom)}. Voici sa photo et ses coordonnées :</p>${img(photoD, d.prenom)}<p>${coord(d)}</p>${conseil}` });
+    const lienA = `${SITE}/conversation.html?t=${dd.token_a}`;
+    const lienD = `${SITE}/conversation.html?t=${dd.token_d}`;
+    const info = '<p style="font-size:13px;color:#cdbfae">Vos numéros et emails restent privés. Quand vous serez prêts tous les deux, cliquez sur « Partager mes coordonnées » dans la conversation. Ce lien est personnel : ne le transférez à personne.</p>';
+    await sendEmail({ to: d.email, subject: `${a.prenom} a accepté votre demande 🎉`,
+      html: `<p>Bonjour ${esc(d.prenom)},</p><p>Bonne nouvelle : ${esc(a.prenom)} souhaite aussi faire votre connaissance. Voici sa photo :</p>${img(photoA, a.prenom)}<p>Vous pouvez maintenant échanger en toute discrétion dans votre conversation privée sur Dewgal.</p>${bouton(lienD, 'Ouvrir la conversation')}${info}` });
+    await sendEmail({ to: a.email, subject: `Votre conversation avec ${d.prenom} est ouverte 💬`,
+      html: `<p>Bonjour ${esc(a.prenom)},</p><p>Vous avez accepté la demande de ${esc(d.prenom)}. Voici sa photo :</p>${img(photoD, d.prenom)}<p>Vous pouvez maintenant échanger en toute discrétion dans votre conversation privée sur Dewgal.</p>${bouton(lienA, 'Ouvrir la conversation')}${info}` });
     if (process.env.ADMIN_EMAIL)
       await sendEmail({ to: process.env.ADMIN_EMAIL, subject: `✅ Mise en relation acceptée · ${a.prenom} (N°${a.id}) et ${d.prenom}`,
-        html: `<p>${esc(a.prenom)} a accepté la demande de ${esc(d.prenom)}. Les deux ont reçu par email la photo et les coordonnées de l'autre.</p><p><strong>Annonce N°${a.id}</strong><br>${coord(a)}</p><p><strong>Demande</strong><br>${coord(d)}</p>` });
-    return page(res, 'C\'est fait 🎉', `Vos coordonnées et celles de ${esc(d.prenom)} viennent de vous être envoyées par email. Belle rencontre !`);
+        html: `<p>${esc(a.prenom)} (${esc(a.email)}) a accepté la demande de ${esc(d.prenom)} (${esc(d.email)}). Leur conversation privée est ouverte. Tu recevras un email quand ils échangeront leurs coordonnées.</p>` });
+    res.statusCode = 302; res.setHeader('Location', `/conversation.html?t=${dd.token_a}`); return res.end();
   }
+
 
   await sb.from('demandes').update({ status: 'refusee', responded_at: now }).eq('id', d.id);
   if (REMBOURSER_SI_REFUS && d.payment_intent) { try { await stripe().refunds.create({ payment_intent: d.payment_intent }); } catch (e) { console.error(e); } }

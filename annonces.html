@@ -19,7 +19,7 @@
   </div>
   <header style="display:flex;flex-direction:column;gap:10px">
     <h1>Des annonces <em>vérifiées</em>, pour construire</h1>
-    <p class="lead">Chaque annonce est relue par une vraie personne avant d'être publiée. Une annonce vous plaît ? Demandez une mise en relation : si la personne accepte, vous recevez ses coordonnées.</p>
+    <p class="lead">Chaque annonce est relue par une vraie personne avant d'être publiée. Une annonce vous plaît ? Demandez une mise en relation : si la personne accepte, une conversation privée s'ouvre entre vous.</p>
   </header>
   <div class="filtres" role="group" aria-label="Filtrer les annonces">
     <button type="button" data-f="tous" aria-pressed="true">Toutes</button>
@@ -43,13 +43,13 @@
     <div><div class="kicker" id="d-lead">Recherche</div><p style="margin:6px 0 0" id="d-seek"></p></div>
     <form class="f" id="demande" novalidate>
       <h2 style="font-size:24px">Demander une mise en relation · 9,90 €</h2>
-      <p class="lead" style="font-size:14px">Votre message et votre présentation sont transmis à la personne. Si elle accepte, vous recevez tous les deux la photo et les coordonnées de l'autre par email. Les 9,90 € rémunèrent la transmission de votre demande : ils ne sont pas remboursés en cas de refus, mais le sont automatiquement si la personne ne répond pas sous 7 jours.</p>
+      <p class="lead" style="font-size:14px">Votre message et votre présentation sont transmis à la personne. Si elle accepte, vous découvrez la photo de l'autre et une conversation privée s'ouvre sur Dewgal. Vos coordonnées ne sont échangées que si vous le souhaitez tous les deux. Les 9,90 € rémunèrent la transmission de votre demande : ils ne sont pas remboursés en cas de refus, mais le sont automatiquement si la personne ne répond pas sous 7 jours.</p>
       <div class="row">
         <label for="q-prenom">Prénom<input id="q-prenom" name="prenom" required autocomplete="given-name"></label>
         <label for="q-age">Âge<input id="q-age" name="age" type="number" min="18" max="99" required></label>
       </div>
       <label for="q-email">Email<input id="q-email" name="email" type="email" required autocomplete="email"></label>
-      <label for="q-tel">Téléphone (facultatif, transmis seulement si elle ou il accepte)<input id="q-tel" name="telephone" type="tel" autocomplete="tel"></label>
+      <label for="q-tel">Téléphone (facultatif, partagé seulement si vous l'acceptez tous les deux)<input id="q-tel" name="telephone" type="tel" autocomplete="tel"></label>
       <label class="photo" for="q-photo">Votre photo (transmise seulement si elle ou il accepte)<input id="q-photo" type="file" accept="image/*" hidden><span id="q-photo-txt">Ajouter une photo de vous</span><img id="q-photo-apercu" alt="" hidden></label>
       <label for="q-msg">Votre message<textarea id="q-msg" name="message" required placeholder="Présentez-vous en quelques lignes : qui vous êtes, ce que vous recherchez…"></textarea></label>
       <label class="consent" for="q-ok"><input id="q-ok" type="checkbox" required>J'ai 18 ans ou plus, j'accepte que mes informations soient transmises à cette personne et j'accepte les <a href="/cgu.html" target="_blank">CGU</a>. Je demande que ma demande soit transmise immédiatement et je reconnais perdre mon droit de rétractation une fois qu'elle l'a été.</label>

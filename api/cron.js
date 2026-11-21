@@ -16,5 +16,7 @@ export default async function handler(req, res) {
       html: `<p>Bonjour ${esc(d.prenom)},</p><p>Votre demande n'a pas reçu de réponse sous ${DELAI_REPONSE_JOURS} jours. Vous êtes intégralement remboursé·e (sous 5 à 10 jours).</p><p>D'autres annonces vous attendent sur Dewgal.</p>` });
   }
   const { data: expirees } = await sb.from('annonces').update({ status: 'expiree' }).eq('status', 'publiee').lt('expires_at', now.toISOString()).select('id');
+  const unAn = new Date(now.getTime() - 365 * 86400000).toISOString();
+  await sb.from('messages').delete().lt('created_at', unAn);
   return json(res, 200, { demandesRemboursees: (vieilles || []).length, annoncesExpirees: (expirees || []).length });
 }

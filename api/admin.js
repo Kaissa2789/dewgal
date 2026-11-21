@@ -24,7 +24,7 @@ export default async function handler(req, res) {
       }
     }
     const { data: publiees } = await sb.from('annonces').select('id, prenom, age, genre, formule, published_at, expires_at, featured_until').eq('status', 'publiee').order('published_at', { ascending: false }).limit(50);
-    const { data: demandes } = await sb.from('demandes').select('id, annonce_id, prenom, status, created_at').neq('status', 'attente_paiement').order('created_at', { ascending: false }).limit(50);
+    const { data: demandes } = await sb.from('demandes').select('id, annonce_id, prenom, status, created_at, signalee, partage_at').neq('status', 'attente_paiement').order('created_at', { ascending: false }).limit(50);
     return json(res, 200, { aVerifier: aVerifier || [], publiees: publiees || [], demandes: demandes || [] });
   }
 

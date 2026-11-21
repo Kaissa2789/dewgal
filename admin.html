@@ -65,7 +65,7 @@ try { MDP = sessionStorage.getItem('dewgal-admin') || ''; } catch (e) {}
 const $ = (id) => document.getElementById(id);
 function el(tag, cls, txt) { const e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; }
 const date = (d) => d ? new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : '';
-const STATUTS = { envoyee: 'en attente de réponse', acceptee: 'acceptée ✓', refusee: 'refusée', expiree: 'expirée, remboursée' };
+const STATUTS = { envoyee: 'en attente de réponse', acceptee: 'conversation en cours', refusee: 'refusée', expiree: 'expirée, remboursée' };
 
 async function api(body) {
   const r = await fetch('/api/admin', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-password': MDP }, body: JSON.stringify(body) });
@@ -114,7 +114,7 @@ async function charger() {
   }
   const dm = $('dem'); dm.innerHTML = '';
   if (!d.demandes.length) dm.append(el('div', null, 'Aucune demande pour le moment'));
-  for (const x of d.demandes) { const r = el('div'); r.append(el('span', null, x.prenom + ' → annonce N°' + x.annonce_id), el('span', null, (STATUTS[x.status] || x.status) + ' · ' + date(x.created_at))); dm.append(r); }
+  for (const x of d.demandes) { const r = el('div'); r.append(el('span', null, (x.signalee ? '⚠️ ' : '') + x.prenom + ' → annonce N°' + x.annonce_id), el('span', null, (x.partage_at ? 'coordonnées échangées ✓' : (STATUTS[x.status] || x.status)) + (x.signalee ? ' · signalée' : '') + ' · ' + date(x.created_at))); dm.append(r); }
 }
 
 function alerte(e) {

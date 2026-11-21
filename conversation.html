@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#2a0d16">
+<title>Conversation · Dewgal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<style>
+html,body{height:100%}
+.chat{max-width:640px;margin:0 auto;height:100%;display:flex;flex-direction:column;padding-block:16px 0}
+.entete{display:flex;align-items:center;gap:14px;padding-bottom:14px;border-bottom:1px solid var(--ligne)}
+.entete img{width:56px;height:56px;border-radius:999px;object-fit:cover;background:var(--nuit-2);flex:none}
+.entete .qui{flex:1;min-width:0}
+.entete .nom{font-family:var(--serif);font-size:26px;line-height:1.1}
+.entete .sous{font-size:12px;color:var(--ivoire-doux)}
+.menu{display:flex;gap:6px;flex-wrap:wrap}
+.fil{flex:1;overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;gap:8px}
+.bulle{max-width:80%;padding:10px 14px;font-size:15px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.bulle.moi{align-self:flex-end;background:var(--ivoire);color:var(--nuit);border-radius:14px 14px 2px 14px}
+.bulle.autre{align-self:flex-start;background:var(--nuit-2);border:1px solid var(--ligne);border-radius:14px 14px 14px 2px}
+.bulle time{display:block;font-size:10px;opacity:.6;margin-top:4px}
+.bandeau{background:var(--nuit-2);border:1px solid var(--ligne);padding:12px 14px;font-size:14px;display:flex;flex-direction:column;gap:10px}
+.bandeau.ok{border-color:var(--rose)}
+.saisie{display:flex;gap:8px;align-items:flex-end;padding:12px 0 max(16px,env(safe-area-inset-bottom,0px));border-top:1px solid var(--ligne)}
+.saisie textarea{flex:1;min-height:48px;max-height:140px;resize:none;border:1px solid var(--ligne);padding:12px}
+.saisie .cta{min-height:48px;padding:0 18px}
+.debut{text-align:center;color:var(--ivoire-doux);font-size:13px;padding:24px 8px}
+</style>
+</head>
+<body>
+<div class="chat">
+  <div class="entete">
+    <img id="photo" alt="" hidden>
+    <div class="qui"><div class="nom" id="nom">Conversation</div><div class="sous">Conversation privée · vos coordonnées restent cachées</div></div>
+    <div class="menu"><button class="btn ghost small" type="button" id="signaler">Signaler</button></div>
+  </div>
+
+  <div id="partage" class="bandeau" style="margin-top:12px" hidden></div>
+
+  <div class="fil" id="fil" aria-live="polite"><p class="debut">Chargement…</p></div>
+
+  <p class="erreur" id="err" hidden></p>
+  <form class="saisie" id="form">
+    <label for="msg" class="sr" style="position:absolute;left:-9999px">Votre message</label>
+    <textarea id="msg" rows="1" maxlength="2000" placeholder="Écrivez votre message…"></textarea>
+    <button class="cta" type="submit">Envoyer</button>
+  </form>
+</div>
+
+<dialog id="dlg-signal">
+  <form class="dlg" method="dialog" id="f-signal">
+    <h2>Signaler cette personne</h2>
+    <p class="lead" style="font-size:14px">Votre signalement est transmis à l'équipe Dewgal, qui lira les derniers messages. La personne n'est pas prévenue.</p>
+    <label for="motif">Que s'est-il passé ?<textarea id="motif" placeholder="Propos déplacés, demande d'argent, faux profil…"></textarea></label>
+    <div class="actions" style="display:flex;gap:8px;flex-wrap:wrap"><button class="cta" value="ok" type="submit">Envoyer le signalement</button><button class="btn ghost" value="annuler" type="submit">Annuler</button></div>
+  </form>
+</dialog>
+
+<script>
+const T = new URLSearchParams(location.search).get('t');
+const $ = (id) => document.getElementById(id);
+let dernierNb = -1, etat = null;
+function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
+const heure = (d) => new Date(d).toLocaleString('fr-FR', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' });
+
+function erreur(m){ $('err').textContent = m; $('err').hidden = !m; }
+
+function rendrePartage(){
+  const b = $('partage'); b.innerHTML = ''; b.hidden = false; b.className = 'bandeau';
+  const p = etat.partage, autre = etat.autre;
+  if (p.moi && p.autre){
+    b.className = 'bandeau ok';
+    b.append(el('strong', null, 'Coordonnées de ' + autre.prenom));
+    const c = el('div'); c.append(el('div', null, 'Email : ' + (autre.email || '—'))); if (autre.telephone) c.append(el('div', null, 'Téléphone : ' + autre.telephone));
+    b.append(c, el('span', null, 'Elles vous ont aussi été envoyées par email.'));
+    return;
+  }
+  if (p.moi){ b.append(el('span', null, 'Vous avez accepté de partager vos coordonnées. Elles seront échangées dès que ' + autre.prenom + ' aura accepté aussi.')); return; }
+  b.append(el('span', null, p.autre ? autre.prenom + ' souhaite échanger vos coordonnées (téléphone, email). Rien n\'est dévoilé tant que vous n\'avez pas accepté.' : 'Prêt·e à continuer par téléphone ? Vos coordonnées ne seront échangées que si vous acceptez tous les deux.'));
+  const btn = el('button', 'btn small', 'Partager mes coordonnées'); btn.type = 'button';
+  btn.onclick = async () => { btn.disabled = true; try { await post({ action: 'partager' }); await charger(); } catch (e) { erreur(e.message); btn.disabled = false; } };
+  b.append(btn);
+}
+
+function rendreMessages(){
+  const fil = $('fil'), bas = fil.scrollHeight - fil.scrollTop - fil.clientHeight < 80;
+  fil.innerHTML = '';
+  if (!etat.messages.length) fil.append(el('p', 'debut', 'Vous avez accepté de faire connaissance. Écrivez le premier message à ' + etat.autre.prenom + ' 🤍'));
+  for (const m of etat.messages){ const b = el('div', 'bulle ' + m.de, m.contenu); b.append(el('time', null, heure(m.date))); fil.append(b); }
+  if (bas || dernierNb === -1) fil.scrollTop = fil.scrollHeight;
+  dernierNb = etat.messages.length;
+}
+
+async function charger(){
+  const r = await fetch('/api/conversation?t=' + encodeURIComponent(T || ''), { cache: 'no-store' });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Conversation introuvable.');
+  const change = !etat || j.messages.length !== etat.messages.length || JSON.stringify(j.partage) !== JSON.stringify(etat.partage);
+  etat = j;
+  if (change){
+    $('nom').textContent = j.autre.prenom + ', ' + j.autre.age + ' ans';
+    if (j.autre.photo){ $('photo').src = j.autre.photo; $('photo').alt = 'Photo de ' + j.autre.prenom; $('photo').hidden = false; }
+    document.title = j.autre.prenom + ' · Dewgal';
+    rendrePartage(); rendreMessages();
+  }
+}
+
+async function post(body){
+  const r = await fetch('/api/conversation', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: T, ...body }) });
+  const j = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(j.error || 'Une erreur est survenue.');
+  return j;
+}
+
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault(); erreur('');
+  const t = $('msg').value.trim(); if (!t) return;
+  const btn = e.target.querySelector('button'); btn.disabled = true;
+  try { await post({ action: 'message', contenu: t }); $('msg').value = ''; await charger(); $('fil').scrollTop = $('fil').scrollHeight; }
+  catch (x) { erreur(x.message); }
+  btn.disabled = false; $('msg').focus();
+});
+$('msg').addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey && window.matchMedia('(pointer:fine)').matches){ e.preventDefault(); $('form').requestSubmit(); } });
+
+$('signaler').onclick = () => $('dlg-signal').showModal();
+$('dlg-signal').addEventListener('close', async () => {
+  if ($('dlg-signal').returnValue !== 'ok') return;
+  try { await post({ action: 'signaler', motif: $('motif').value }); $('motif').value = ''; erreur(''); const b = $('partage'); b.hidden = false; b.prepend(el('strong', null, 'Merci, votre signalement a bien été transmis.')); }
+  catch (x) { erreur(x.message); }
+});
+
+charger().catch((e) => { $('fil').innerHTML = ''; $('fil').append(el('p', 'debut', e.message)); $('form').hidden = true; $('signaler').hidden = true; });
+setInterval(() => { if (!document.hidden && etat) charger().catch(() => {}); }, 8000);
+</script>
+</body>
+</html>
