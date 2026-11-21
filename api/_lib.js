@@ -68,7 +68,7 @@ export async function sendEmail({ to, subject, html, replyTo }) {
       to: Array.isArray(to) ? to : [to],
       subject,
       html: layout(html),
-      ...(replyTo ? { reply_to: replyTo } : {}),
+      ...((replyTo || process.env.REPLY_TO) ? { reply_to: replyTo || process.env.REPLY_TO } : {}),
     }),
   });
   if (!r.ok) console.error('Resend', r.status, await r.text());
