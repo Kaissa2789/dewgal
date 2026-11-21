@@ -57,7 +57,7 @@ export default async function handler(req, res) {
         html: `<p>Bonjour ${esc(a.prenom)},</p>
 <p>Une personne a lu votre annonce N°${a.id} sur Dewgal et souhaite faire votre connaissance :</p>
 <p style="border-left:2px solid #e3b3b0;padding-left:14px"><strong>${esc(d.prenom)}, ${d.age} ans</strong><br>${esc(d.message).replace(/\n/g, '<br>')}</p>
-<p>Si vous acceptez, vous recevrez tous les deux vos coordonnées par email. Si vous refusez, la personne est prévenue avec délicatesse.</p>
+<p>Si vous acceptez, vous découvrirez sa photo et une conversation privée s'ouvrira entre vous sur Dewgal. Vos coordonnées restent cachées tant que vous ne décidez pas de les partager. Si vous refusez, la personne est prévenue avec délicatesse.</p>
 ${bouton(`${base}&r=oui`, 'J\'accepte la mise en relation')}
 <p><a href="${base}&r=non" style="color:#cdbfae">Je préfère refuser</a></p>
 <p style="font-size:13px;color:#cdbfae">Sans réponse sous ${DELAI_REPONSE_JOURS} jours, la demande sera annulée.</p>`,
