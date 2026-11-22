@@ -75,7 +75,7 @@
 
     <div class="kicker">3 · Vos photos</div>
     <label class="photo" for="photo">Photo de profil · affichée <strong>floutée</strong> sur l'annonce, nette seulement pour les personnes que vous acceptez<input id="photo" type="file" accept="image/*" hidden><span id="photo-txt">Ajouter ma photo</span><img id="photo-ap" alt="" hidden></label>
-    <label class="photo" for="selfie">Selfie de vérification · tenez une feuille où vous avez écrit à la main <strong>DEWGAL <span id="date-jour"></span></strong>, visage bien visible. Jamais publié, supprimé après vérification<input id="selfie" type="file" accept="image/*" capture="user" hidden><span id="selfie-txt">Prendre mon selfie</span><img id="selfie-ap" alt="" hidden></label>
+    <label class="photo" for="selfie">Selfie de vérification · tenez une feuille où vous avez écrit à la main <strong>DEWGAL <span id="date-jour"></span></strong>, visage bien visible. Jamais publié, supprimé après vérification<input id="selfie" type="file" accept="image/*" hidden><span id="selfie-txt">Prendre mon selfie</span><img id="selfie-ap" alt="" hidden></label>
 
     <div class="kicker">4 · Vous contacter</div>
     <label for="email">Email (jamais affiché)<input id="email" name="email" type="email" required autocomplete="email"></label>
@@ -125,7 +125,9 @@ $('form').addEventListener('submit', async (e) => {
   if (!$('selfie').files[0]) return manque('Merci d\'ajouter votre selfie de vérification.');
   btn.disabled = true; btn.textContent = 'Préparation des photos…';
   try {
-    const [photo, flou, selfie] = await Promise.all([photoCompressee($('photo').files[0]), photoFloutee($('photo').files[0]), photoCompressee($('selfie').files[0])]);
+    const photo = await photoCompressee($('photo').files[0]);
+    const flou = await photoFloutee($('photo').files[0]);
+    const selfie = await photoCompressee($('selfie').files[0]);
     btn.textContent = 'Redirection vers le paiement…';
     const data = Object.fromEntries(new FormData(f).entries());
     const r = await fetch('/api/publier', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...data, photo, flou, selfie, consent: $('ok').checked }) });

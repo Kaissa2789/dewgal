@@ -19,7 +19,10 @@ function versCanvas(img, maxCote) {
 // Photo nette compressée (≈ 1200 px)
 async function photoCompressee(file) {
   const img = await lireImage(file);
-  return versCanvas(img, 1200).toDataURL('image/jpeg', 0.82);
+  const c = versCanvas(img, 1200);
+  const out = c.toDataURL('image/jpeg', 0.82);
+  c.width = c.height = 0; // libère la mémoire (iPhone)
+  return out;
 }
 // Version floutée irréversible : réduite à ~16 px puis agrandie et adoucie
 async function photoFloutee(file) {
