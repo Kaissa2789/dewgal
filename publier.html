@@ -66,7 +66,7 @@
 
     <div class="kicker">3 · Vos photos</div>
     <label class="photo" for="photo">Photo de profil · affichée <strong>floutée</strong> sur l'annonce, nette seulement pour les personnes que vous acceptez<input id="photo" type="file" accept="image/*" hidden><span id="photo-txt">Ajouter ma photo</span><img id="photo-ap" alt="" hidden></label>
-    <label class="photo" for="selfie">Selfie de vérification · levez 2 doigts, visage bien visible. Jamais publié, supprimé après vérification<input id="selfie" type="file" accept="image/*" capture="user" hidden><span id="selfie-txt">Prendre mon selfie</span><img id="selfie-ap" alt="" hidden></label>
+    <label class="photo" for="selfie">Selfie de vérification · tenez une feuille où vous avez écrit à la main <strong>DEWGAL <span id="date-jour"></span></strong>, visage bien visible. Jamais publié, supprimé après vérification<input id="selfie" type="file" accept="image/*" capture="user" hidden><span id="selfie-txt">Prendre mon selfie</span><img id="selfie-ap" alt="" hidden></label>
 
     <div class="kicker">4 · Vous contacter</div>
     <label for="email">Email (jamais affiché)<input id="email" name="email" type="email" required autocomplete="email"></label>
@@ -104,6 +104,7 @@ function apercu(input, img, txt, label) {
 }
 apercu($('photo'), $('photo-ap'), $('photo-txt'), 'Photo ajoutée · changer');
 apercu($('selfie'), $('selfie-ap'), $('selfie-txt'), 'Selfie ajouté · changer');
+$('date-jour').textContent = new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
 
 $('form').addEventListener('submit', async (e) => {
   e.preventDefault();
