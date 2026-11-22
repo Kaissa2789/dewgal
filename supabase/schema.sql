@@ -70,3 +70,8 @@ on conflict (id) do nothing;
 revoke all on table annonces, demandes from anon, authenticated;
 grant all on table annonces, demandes to service_role;
 grant usage, select on all sequences in schema public to service_role;
+
+-- Fiche plus complète (22/11)
+alter table annonces add column if not exists passions text;
+alter table annonces add column if not exists enfants text;
+alter table annonces add column if not exists veut_enfants text;

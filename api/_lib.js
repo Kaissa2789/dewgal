@@ -54,7 +54,7 @@ export function addDays(d, n) {
 
 // Champs visibles publiquement (jamais l'email ni le téléphone)
 export const PUBLIC_FIELDS =
-  'id, genre, prenom, age, origine, peuple, religion, ville, profession, description, recherche, formule, published_at, featured_until, flou_path';
+  'id, genre, prenom, age, origine, peuple, religion, ville, profession, passions, enfants, veut_enfants, description, recherche, formule, published_at, featured_until, flou_path';
 
 export async function sendEmail({ to, subject, html, replyTo }) {
   if (!process.env.RESEND_API_KEY) {

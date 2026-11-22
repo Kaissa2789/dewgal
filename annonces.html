@@ -76,6 +76,16 @@ let annonces = [], filtre = 'tous', courante = null;
 function el(tag, cls, txt){ const e=document.createElement(tag); if(cls) e.className=cls; if(txt!=null) e.textContent=txt; return e; }
 function ident(a){ return [a.origine && ('Origine ' + a.origine + (a.peuple ? ' · ' + a.peuple : '')), a.religion, a.profession, a.ville].filter(Boolean).join(' · '); }
 
+
+function famille(a){
+  const n = a.enfants, v = a.veut_enfants, e = a.genre === 'elle' ? 'e' : '';
+  const t = [];
+  if (n === '0') t.push('Sans enfant'); else if (n === '1') t.push('1 enfant'); else if (n) t.push((n === '4+' ? '4 enfants ou plus' : n + ' enfants'));
+  const autres = n && n !== '0' ? 'd’autres enfants' : 'des enfants';
+  if (v === 'oui') t.push('Souhaite ' + autres); else if (v === 'ouvert') t.push('Ouvert' + e + ' à ' + (n && n !== '0' ? 'en avoir d’autres' : 'en avoir')); else if (v === 'non') t.push('Ne souhaite pas ' + (n && n !== '0' ? 'd’autres enfants' : 'd’enfants'));
+  return t.join(' · ');
+}
+
 function rendre(){
   grille.innerHTML='';
   const liste = annonces.filter(a => filtre==='tous' || a.genre===filtre);
@@ -88,7 +98,7 @@ function rendre(){
     tags.append(el('span','pill rose', a.genre==='elle'?'Elle':'Lui'));
     if(a.une) tags.append(el('span','pill ivoire','À la une'));
     h.append(tags, el('span','num','N°'+a.id));
-    c.append(h, el('div','nom', a.prenom+', '+a.age+' ans'), el('div','ident', ident(a)), el('div','hook', a.description), el('div','seek', (a.genre==='elle'?'Elle recherche : ':'Il recherche : ')+a.recherche));
+    c.append(h, el('div','nom', a.prenom+', '+a.age+' ans'), el('div','ident', ident(a)), ...(famille(a) ? [el('div','ident', '👶 ' + famille(a))] : []), ...(a.passions ? [el('div','ident', '✨ Passions : ' + a.passions)] : []), el('div','hook', a.description), el('div','seek', (a.genre==='elle'?'Elle recherche : ':'Il recherche : ')+a.recherche));
     const b = el('button','btn small','Demander une mise en relation'); b.type='button'; b.style.marginTop='8px';
     b.onclick = () => ouvrir(a);
     c.append(b);

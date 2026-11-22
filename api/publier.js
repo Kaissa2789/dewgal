@@ -18,6 +18,9 @@ async function traiter(req, res) {
     religion: clean(b.religion, 40),
     ville: clean(b.ville, 60),
     profession: clean(b.profession, 80),
+    passions: clean(b.passions, 150),
+    enfants: ['0', '1', '2', '3', '4+'].includes(b.enfants) ? b.enfants : null,
+    veut_enfants: ['oui', 'ouvert', 'non'].includes(b.veut_enfants) ? b.veut_enfants : null,
     description: clean(b.description, 400),
     recherche: clean(b.recherche, 500),
     email: clean(b.email, 120),
@@ -37,7 +40,12 @@ async function traiter(req, res) {
   if (!photo || !flou) return json(res, 400, { error: 'Merci d\'ajouter votre photo de profil.' });
 
   const sb = db();
-  const { data: row, error } = await sb.from('annonces').insert(annonce).select('id').single();
+  let { data: row, error } = await sb.from('annonces').insert(annonce).select('id').single();
+  if (error && /passions|enfants/.test(error.message || '')) {
+    // colonnes pas encore créées dans Supabase : on enregistre sans ces champs
+    const { passions, enfants, veut_enfants, ...base } = annonce;
+    ({ data: row, error } = await sb.from('annonces').insert(base).select('id').single());
+  }
   if (error) return json(res, 500, { error: 'Enregistrement impossible, réessayez.' });
 
   const t = Date.now();

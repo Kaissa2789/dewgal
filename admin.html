@@ -99,6 +99,7 @@ async function charger() {
     c.append(h, ph, el('div', 'nom', a.prenom + ', ' + a.age + ' ans'),
       el('div', 'priv', '✍️ Attendu sur la feuille : DEWGAL ' + new Date(a.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' }) + ' (± 1 jour)'),
       el('div', 'ident', [a.origine, a.peuple, a.religion, a.profession, a.ville].filter(Boolean).join(' · ')),
+      el('div', 'ident', 'Enfants : ' + (a.enfants ?? '–') + ' · En veut : ' + (a.veut_enfants ?? '–') + (a.passions ? ' · Passions : ' + a.passions : '')),
       el('div', 'hook', a.description), el('div', 'seek', 'Recherche : ' + a.recherche),
       el('div', 'priv', a.email + (a.telephone ? ' · ' + a.telephone : '')));
     const act = el('div', 'actions');
