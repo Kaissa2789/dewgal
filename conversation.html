@@ -165,6 +165,12 @@ async function activerNotifs(btn){
 async function afficherNotif(){
   const b = $('notif'); b.innerHTML = '';
   const supporte = 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+  const v = (navigator.userAgent.match(/OS (\d+)_(\d+)/) || []);
+  const iosTropVieux = estIOS && v[1] && (+v[1] < 16 || (+v[1] === 16 && +v[2] < 4));
+  if (iosTropVieux || (estIOS && installee && !supporte)){
+    b.append(el('strong', null, '🔔 Notifications indisponibles sur cette version d’iPhone'), el('span', null, 'Mettez à jour votre iPhone (Réglages → Général → Mise à jour logicielle, iOS 16.4 minimum) pour recevoir les notifications. En attendant, vous êtes prévenu·e par email à chaque nouveau message.'));
+    b.hidden = false; return;
+  }
   if (estIOS && !installee){
     b.append(el('strong', null, '📲 Installez Dewgal sur votre iPhone'), el('span', null, 'Touchez le bouton Partager (le carré avec une flèche), puis « Sur l’écran d’accueil ». Ouvrez ensuite Dewgal depuis l’icône pour activer les notifications.'));
     b.hidden = false; return;
