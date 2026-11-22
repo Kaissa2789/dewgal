@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#2a0d16">
+<title>Modifier mon annonce · Dewgal</title>
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap">
+<link rel="stylesheet" href="/assets/style.css">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/assets/icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Dewgal">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<script src="/assets/pwa.js" defer></script>
+</head>
+<body>
+<main class="wrap narrow">
+  <div class="top"><a class="logo" href="/">DEWGAL</a><a href="/annonces.html">Voir les annonces</a></div>
+  <header style="display:flex;flex-direction:column;gap:10px">
+    <h1>Modifier mon <em>annonce</em></h1>
+    <p class="lead" id="intro">Chargement…</p>
+  </header>
+  <p class="erreur" id="err" hidden></p>
+  <p class="lead" id="ok" hidden style="color:var(--rose)"></p>
+
+  <form class="f" id="form" novalidate hidden>
+    <div class="kicker">Mon texte</div>
+    <p style="margin:0;font-size:14px;color:var(--ivoire-doux)">Le prénom, l'âge et l'origine ne peuvent pas être modifiés, car ils ont été vérifiés.</p>
+    <div class="row">
+      <label for="ville">Ville<input id="ville" name="ville" maxlength="60"></label>
+      <label for="profession">Profession (facultatif)<input id="profession" name="profession" maxlength="80"></label>
+    </div>
+    <div class="row">
+      <label for="enfants">Enfants
+        <select id="enfants" name="enfants"><option value="">Préfère ne pas dire</option><option value="0">Sans enfant</option><option value="1">1 enfant</option><option value="2">2 enfants</option><option value="3">3 enfants</option><option value="4+">4 enfants ou plus</option></select>
+      </label>
+      <label for="veut_enfants">Souhaitez-vous (encore) des enfants ?
+        <select id="veut_enfants" name="veut_enfants"><option value="">Préfère ne pas dire</option><option value="oui">Oui</option><option value="ouvert">Ouvert·e, à voir</option><option value="non">Non</option></select>
+      </label>
+    </div>
+    <label for="passions">Vos passions (facultatif)<input id="passions" name="passions" maxlength="150"></label>
+    <label for="description">Vous en quelques mots<textarea id="description" name="description" required maxlength="400"></textarea></label>
+    <label for="recherche">Ce que vous recherchez<textarea id="recherche" name="recherche" required maxlength="500"></textarea></label>
+    <button class="cta" type="submit" id="go">Enregistrer</button>
+
+    <div class="kicker" style="margin-top:24px">Ma photo</div>
+    <p style="margin:0;font-size:14px;color:var(--ivoire-doux)" id="photo-info">Une nouvelle photo est vérifiée avant d'apparaître. En attendant, votre annonce garde l'ancienne.</p>
+    <label class="photo" for="photo">Choisir une nouvelle photo<input id="photo" type="file" accept="image/*" hidden><span id="photo-txt">Ajouter une photo</span><img id="photo-ap" alt="" hidden></label>
+    <button class="btn" type="button" id="envoyer-photo" hidden>Envoyer la photo</button>
+
+    <div class="kicker" style="margin-top:24px">Retirer mon annonce</div>
+    <p style="margin:0;font-size:14px;color:var(--ivoire-doux)">Vous avez trouvé quelqu'un, ou vous faites une pause ? L'annonce disparaît tout de suite. Ce n'est pas remboursé et ça ne peut pas être annulé.</p>
+    <input id="raison" placeholder="Pourquoi ? (facultatif)" aria-label="Raison du retrait" hidden>
+    <button class="btn ghost" type="button" id="retirer">Retirer mon annonce</button>
+  </form>
+  <footer><span><a href="/mentions-legales.html">Mentions légales</a> · <a href="/cgu.html">CGU et CGV</a> · <a href="/confidentialite.html">Confidentialité</a></span></footer>
+</main>
+<script src="/assets/images.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const T = new URLSearchParams(location.search).get('t') || '';
+const CHAMPS = ['ville', 'profession', 'passions', 'enfants', 'veut_enfants', 'description', 'recherche'];
+function erreur(m) { $('ok').hidden = true; $('err').textContent = m; $('err').hidden = false; $('err').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+function bravo(m) { $('err').hidden = true; $('ok').textContent = m; $('ok').hidden = false; $('ok').scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+async function post(body) {
+  const r = await fetch('/api/modifier', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ t: T, ...body }) });
+  const j = await r.json().catch(() => ({ error: 'Le serveur ne répond pas (' + r.status + '). Réessayez.' }));
+  if (!r.ok) throw new Error(j.error || 'Une erreur est survenue.');
+  return j;
+}
+
+fetch('/api/modifier?t=' + encodeURIComponent(T)).then((r) => r.json().then((j) => ({ r, j }))).then(({ r, j }) => {
+  if (!r.ok) { $('intro').textContent = j.error || 'Lien invalide.'; return; }
+  if (!['publiee', 'a_verifier'].includes(j.status)) { $('intro').textContent = 'Cette annonce n’est plus en ligne.'; return; }
+  $('intro').textContent = j.prenom + ', ' + j.age + ' ans · annonce N°' + j.id + (j.status === 'a_verifier' ? ' · en cours de vérification' : ' · en ligne');
+  for (const k of CHAMPS) $(k).value = j[k] || '';
+  if (j.photo_en_attente) $('photo-info').textContent = 'Une nouvelle photo est déjà en cours de vérification. Vous pouvez la remplacer.';
+  $('form').hidden = false;
+}).catch(() => { $('intro').textContent = 'Chargement impossible. Vérifiez votre connexion.'; });
+
+$('form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  if (!$('description').value.trim() || !$('recherche').value.trim()) return erreur('La description et la recherche sont obligatoires.');
+  const btn = $('go'); btn.disabled = true; btn.textContent = 'Enregistrement…';
+  try { const d = {}; for (const k of CHAMPS) d[k] = $(k).value; await post({ action: 'enregistrer', ...d }); bravo('C’est enregistré ✓ Votre annonce est à jour (environ 1 minute pour apparaître sur le site).'); }
+  catch (x) { erreur(x.message); }
+  btn.disabled = false; btn.textContent = 'Enregistrer';
+});
+
+$('photo').addEventListener('change', () => { const f = $('photo').files[0]; if (!f) return; $('photo-ap').src = URL.createObjectURL(f); $('photo-ap').hidden = false; $('photo-txt').textContent = 'Photo choisie · changer'; $('envoyer-photo').hidden = false; });
+$('envoyer-photo').onclick = async () => {
+  const f = $('photo').files[0]; if (!f) return;
+  const btn = $('envoyer-photo'); btn.disabled = true; btn.textContent = 'Envoi…';
+  try {
+    const photo = await photoCompressee(f); const flou = await photoFloutee(f);
+    await post({ action: 'photo', photo, flou });
+    bravo('Photo envoyée ✓ Elle sera vérifiée sous 48 h, vous recevrez un email.');
+    $('photo-info').textContent = 'Une nouvelle photo est en cours de vérification.'; btn.hidden = true;
+  } catch (x) { erreur(x.message); }
+  btn.disabled = false; btn.textContent = 'Envoyer la photo';
+};
+
+$('retirer').onclick = async () => {
+  const btn = $('retirer');
+  if ($('raison').hidden) { $('raison').hidden = false; btn.textContent = 'Confirmer : retirer définitivement'; return; }
+  btn.disabled = true;
+  try { await post({ action: 'retirer', raison: $('raison').value }); $('form').hidden = true; $('intro').textContent = 'Votre annonce est retirée. Merci d’avoir fait confiance à Dewgal 💍'; }
+  catch (x) { erreur(x.message); btn.disabled = false; }
+};
+</script>
+</body>
+</html>

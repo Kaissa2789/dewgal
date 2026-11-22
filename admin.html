@@ -55,6 +55,12 @@
       <div id="verif" class="grille"></div>
     </div>
 
+    <div id="photos-wrap" style="display:flex;flex-direction:column;gap:14px" hidden>
+      <h2>Nouvelles photos à vérifier</h2>
+      <p class="lead" style="font-size:14px">Même personne que l'ancienne photo ? Photo correcte ?</p>
+      <div id="photos" class="grille"></div>
+    </div>
+
     <div style="display:flex;flex-direction:column;gap:10px">
       <h2>En ligne</h2>
       <div id="pub" class="liste"></div>
@@ -115,11 +121,34 @@ async function charger() {
     act.append(ok, ko); c.append(act, motif); v.append(c);
   }
 
+  const ph = $('photos'); ph.innerHTML = ''; const lp = d.photos || [];
+  $('photos-wrap').hidden = !lp.length;
+  for (const a of lp) {
+    const c = el('article', 'carte');
+    const h = el('div', 'haut'); h.append(el('span', 'pill rose', a.genre === 'elle' ? 'Elle' : 'Lui'), el('span', 'num', 'N°' + a.id)); 
+    const g = el('div', 'photos');
+    for (const [u, t] of [[a.photo_url, 'Photo actuelle'], [a.nouvelle_url, 'Nouvelle photo']]) { const f = el('figure'); const i = el('img'); if (u) i.src = u; i.alt = t; f.append(i, el('figcaption', null, t)); g.append(f); }
+    const act = el('div', 'actions');
+    const ok = el('button', 'btn small', 'Accepter la photo'); ok.type = 'button';
+    const ko = el('button', 'btn ghost small', 'Refuser'); ko.type = 'button';
+    const motif = el('input'); motif.placeholder = 'Motif (envoyé à la personne)'; motif.setAttribute('aria-label', 'Motif'); motif.hidden = true;
+    ok.onclick = async () => { ok.disabled = ko.disabled = true; try { await api({ action: 'photo_ok', id: a.id }); await charger(); } catch (e) { alerte(e); ok.disabled = ko.disabled = false; } };
+    ko.onclick = async () => {
+      if (motif.hidden) { motif.hidden = false; ko.textContent = 'Confirmer le refus'; motif.focus(); return; }
+      ok.disabled = ko.disabled = true;
+      try { await api({ action: 'photo_ko', id: a.id, motif: motif.value }); await charger(); } catch (e) { alerte(e); ok.disabled = ko.disabled = false; }
+    };
+    act.append(ok, ko); c.append(h, g, el('div', 'nom', a.prenom + ', ' + a.age + ' ans'), act, motif); ph.append(c);
+  }
+
   const p = $('pub'); p.innerHTML = '';
   if (!d.publiees.length) p.append(el('div', null, 'Aucune annonce en ligne'));
   for (const a of d.publiees) {
     const r = el('div'); const une = a.featured_until && a.featured_until > new Date().toISOString();
-    r.append(el('span', null, 'N°' + a.id + ' · ' + a.prenom + ', ' + a.age + ' ans' + (une ? ' · À la une' : '')), el('span', null, 'jusqu\'au ' + date(a.expires_at)));
+    const lien = el('button', 'btn ghost small', '✉️ Lien modif'); lien.type = 'button'; lien.style.marginLeft = '8px';
+    lien.onclick = async () => { lien.disabled = true; try { await api({ action: 'lien', id: a.id }); lien.textContent = 'Envoyé ✓'; } catch (e) { alerte(e); lien.disabled = false; } };
+    const droite = el('span', null, 'jusqu\'au ' + date(a.expires_at)); droite.append(lien);
+    r.append(el('span', null, 'N°' + a.id + ' · ' + a.prenom + ', ' + a.age + ' ans' + (une ? ' · À la une' : '')), droite);
     p.append(r);
   }
   const dm = $('dem'); dm.innerHTML = '';

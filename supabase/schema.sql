@@ -75,3 +75,9 @@ grant usage, select on all sequences in schema public to service_role;
 alter table annonces add column if not exists passions text;
 alter table annonces add column if not exists enfants text;
 alter table annonces add column if not exists veut_enfants text;
+
+-- Modification d'annonce (22/11)
+alter table annonces add column if not exists edit_token uuid default gen_random_uuid();
+alter table annonces add column if not exists photo_attente_path text;
+alter table annonces add column if not exists flou_attente_path text;
+create unique index if not exists annonces_edit_token_idx on annonces(edit_token);
