@@ -35,7 +35,7 @@ async function traiter(req, res) {
 
   const session = await stripe().checkout.sessions.create({
     mode: 'payment',
-    allow_promotion_codes: true,
+    allow_promotion_codes: process.env.PROMO_DEMANDES === 'oui', // désactivé par défaut
     customer_email: d.email,
     line_items: [{
       quantity: 1,

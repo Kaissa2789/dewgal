@@ -53,7 +53,7 @@ async function traiter(req, res) {
 
   const session = await stripe().checkout.sessions.create({
     mode: 'payment',
-    allow_promotion_codes: true,
+    allow_promotion_codes: formule === 'standard', // codes promo valables seulement sur l'annonce à 19 €
     customer_email: annonce.email,
     line_items: [{
       quantity: 1,
